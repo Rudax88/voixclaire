@@ -1,0 +1,3986 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoixClaire — Entraînement à l'élocution</title>
+  <meta name="description" content="Application premium d'entraînement à l'articulation, la diction et la parole distincte." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+/* ============================================
+   VOIXCLAIRE — DESIGN SYSTEM PREMIUM
+   Stack: Vanilla JS + Custom CSS
+   Direction: Coaching vocal haut de gamme
+   ============================================ */
+
+/* ── TOKENS ─────────────────────────────────── */
+:root {
+  /* Colors */
+  --bg-base:       #0D0F14;
+  --bg-surface:    #13161E;
+  --bg-card:       #1A1D26;
+  --bg-card-hover: #1F2330;
+  --bg-elevated:   #252A38;
+  --border:        #2A2F42;
+  --border-subtle: #1F2330;
+
+  --accent:        #4F7FFF;
+  --accent-dim:    #3A5FCC;
+  --accent-glow:   rgba(79, 127, 255, 0.15);
+  --accent-soft:   rgba(79, 127, 255, 0.08);
+
+  --purple:        #A78BFA;
+  --purple-dim:    #7C5CBF;
+  --purple-glow:   rgba(167, 139, 250, 0.12);
+
+  --green:         #34D399;
+  --green-dim:     #059669;
+  --green-soft:    rgba(52, 211, 153, 0.08);
+
+  --amber:         #FBBF24;
+  --amber-soft:    rgba(251, 191, 36, 0.08);
+
+  --red:           #F87171;
+  --red-soft:      rgba(248, 113, 113, 0.08);
+
+  --text-primary:   #F0F2F8;
+  --text-secondary: #8B92A5;
+  --text-muted:     #4A5165;
+  --text-inverse:   #0D0F14;
+
+  /* Typography */
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radius */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.35), 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
+  --shadow-accent: 0 0 24px rgba(79, 127, 255, 0.25);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
+
+  /* Transitions */
+  --transition-fast:   150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base:   250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Nav */
+  --nav-height: 64px;
+  --sidebar-width: 240px;
+}
+
+/* ── RESET & BASE ─────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── LOADING SCREEN ────────────────────────── */
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  z-index: 9999;
+  transition: opacity var(--transition-slow), visibility var(--transition-slow);
+}
+.loading-screen.hidden { opacity: 0; visibility: hidden; }
+
+.loading-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.logo-icon {
+  width: 44px; height: 44px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+.loading-bar {
+  width: 160px; height: 2px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--purple));
+  border-radius: var(--radius-full);
+  animation: loadingProgress 1.8s ease-in-out forwards;
+}
+@keyframes loadingProgress {
+  0%   { width: 0%; }
+  60%  { width: 75%; }
+  100% { width: 100%; }
+}
+
+.wave-anim {
+  animation: wavePulse 2s ease-in-out infinite;
+}
+@keyframes wavePulse {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+  50%       { stroke-dashoffset: -20; opacity: 0.6; }
+}
+
+/* ── APP LAYOUT ────────────────────────────── */
+#app { min-height: 100vh; }
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform var(--transition-base);
+}
+
+.sidebar-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; gap: var(--space-3);
+}
+.sidebar-logo-icon {
+  width: 36px; height: 36px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(79,127,255,0.3);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.sidebar-logo-text {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-4) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow-y: auto;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+.nav-item:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(79,127,255,0.15);
+}
+.nav-item .nav-icon {
+  width: 18px; height: 18px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+
+.sidebar-footer {
+  padding: var(--space-4) var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+}
+.user-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.user-pill:hover { background: var(--bg-elevated); }
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  truncate: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.user-status {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ── MAIN CONTENT ──────────────────────────── */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  height: var(--nav-height);
+  background: rgba(13,15,20,0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.top-bar-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.page-content {
+  flex: 1;
+  padding: var(--space-8);
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ── MOBILE TOPBAR ─────────────────────────── */
+.mobile-topbar {
+  display: none;
+  height: 56px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 var(--space-5);
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ── BUTTONS ────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-5);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 8px rgba(79,127,255,0.3);
+}
+.btn-primary:hover:not(:disabled) {
+  background: #6090FF;
+  box-shadow: 0 4px 16px rgba(79,127,255,0.4);
+  transform: translateY(-1px);
+}
+.btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-card-hover);
+  border-color: var(--text-muted);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.btn-danger {
+  background: var(--red-soft);
+  color: var(--red);
+  border: 1px solid rgba(248,113,113,0.2);
+}
+.btn-danger:hover:not(:disabled) { background: rgba(248,113,113,0.15); }
+
+.btn-lg { padding: 14px var(--space-8); font-size: 15px; border-radius: var(--radius-lg); }
+.btn-sm { padding: 6px var(--space-3); font-size: 12px; }
+.btn-icon { padding: 8px; width: 36px; height: 36px; border-radius: var(--radius-md); }
+
+/* ── BADGES ─────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-blue   { background: var(--accent-soft);   color: var(--accent);  border: 1px solid rgba(79,127,255,0.2); }
+.badge-purple { background: var(--purple-glow);   color: var(--purple);  border: 1px solid rgba(167,139,250,0.2); }
+.badge-green  { background: var(--green-soft);    color: var(--green);   border: 1px solid rgba(52,211,153,0.2); }
+.badge-amber  { background: var(--amber-soft);    color: var(--amber);   border: 1px solid rgba(251,191,36,0.2); }
+
+/* ── CARDS ──────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-base);
+}
+.card-hover:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.card-accent {
+  border-color: rgba(79,127,255,0.2);
+  box-shadow: var(--shadow-card), inset 0 0 0 1px rgba(79,127,255,0.05);
+}
+
+/* ── STATS CARDS ─────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+}
+.stat-card {
+  padding: var(--space-5) var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--stat-accent, var(--accent));
+  opacity: 0.6;
+}
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+.stat-trend.up   { background: var(--green-soft);  color: var(--green); }
+.stat-trend.down { background: var(--red-soft);    color: var(--red); }
+
+/* ── SECTION HEADERS ─────────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.section-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ── PROGRESS BARS ───────────────────────────── */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--accent), var(--purple));
+  transition: width var(--transition-slow);
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+.progress-ring-track {
+  fill: none;
+  stroke: var(--bg-elevated);
+  stroke-width: 4;
+}
+.progress-ring-fill {
+  fill: none;
+  stroke: url(#ringGradient);
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--transition-slow);
+}
+
+/* ── EXERCISE CARDS ─────────────────────────── */
+.exercise-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.exercise-card {
+  padding: var(--space-6);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.exercise-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(79,127,255,0.04));
+  pointer-events: none;
+}
+
+.exercise-type-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.exercise-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.2px;
+}
+.exercise-card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+}
+.exercise-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.exercise-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.difficulty-dot {
+  display: flex; gap: 3px;
+}
+.difficulty-dot span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+}
+.difficulty-dot span.active { background: var(--accent); }
+
+/* ── TIMER / CHRONO ─────────────────────────── */
+.timer-display {
+  font-family: var(--font-mono);
+  font-size: 56px;
+  font-weight: 500;
+  letter-spacing: -2px;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1;
+}
+.timer-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: var(--space-2);
+}
+
+/* ── RECORDING INTERFACE ────────────────────── */
+.recording-zone {
+  padding: var(--space-8);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  position: relative;
+  overflow: hidden;
+}
+.recording-zone.active {
+  border-color: rgba(248,113,113,0.3);
+  box-shadow: 0 0 32px rgba(248,113,113,0.08);
+}
+
+.waveform-container {
+  width: 100%;
+  height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.waveform-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.record-btn-outer {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--bg-elevated);
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  position: relative;
+}
+.record-btn-outer:hover {
+  border-color: var(--red);
+  box-shadow: 0 0 0 6px rgba(248,113,113,0.1);
+}
+.record-btn-outer.recording {
+  border-color: var(--red);
+  box-shadow: 0 0 0 6px rgba(248,113,113,0.15);
+  animation: recordPulse 1.5s ease-in-out infinite;
+}
+@keyframes recordPulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(248,113,113,0.15); }
+  50%       { box-shadow: 0 0 0 10px rgba(248,113,113,0.05); }
+}
+
+.record-btn-inner {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--red);
+  transition: all var(--transition-base);
+}
+.record-btn-outer.recording .record-btn-inner {
+  border-radius: var(--radius-sm);
+  width: 22px; height: 22px;
+}
+
+.recording-time {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--red);
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+.recording-time.visible { opacity: 1; }
+
+/* ── SCORE DISPLAY ──────────────────────────── */
+.score-circle {
+  position: relative;
+  width: 120px; height: 120px;
+  display: flex; align-items: center; justify-content: center;
+}
+.score-value {
+  position: absolute;
+  text-align: center;
+}
+.score-number {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.score-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ── STREAK COMPONENT ───────────────────────── */
+.streak-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--amber-soft);
+  border: 1px solid rgba(251,191,36,0.15);
+  border-radius: var(--radius-md);
+}
+.streak-fire { font-size: 20px; }
+.streak-count {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--amber);
+}
+.streak-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── WEEKLY CHART ────────────────────────────── */
+.weekly-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  height: 80px;
+  padding: var(--space-2) 0;
+}
+.chart-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  height: 100%;
+  justify-content: flex-end;
+}
+.chart-bar {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: var(--bg-elevated);
+  transition: height var(--transition-slow), background var(--transition-fast);
+  position: relative;
+  cursor: pointer;
+}
+.chart-bar.filled { background: linear-gradient(180deg, var(--accent) 0%, var(--purple) 100%); }
+.chart-bar.today  { background: var(--accent); box-shadow: 0 0 12px rgba(79,127,255,0.4); }
+.chart-bar:hover  { filter: brightness(1.2); }
+.chart-day {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.chart-day.today { color: var(--accent); }
+
+/* ── SESSIONS LIST ──────────────────────────── */
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.session-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+.session-item:hover {
+  border-color: var(--border);
+  background: var(--bg-card-hover);
+}
+.session-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+.session-info { flex: 1; }
+.session-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.session-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.session-score {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--accent);
+}
+
+/* ── EXERCISE ACTIVE VIEW ────────────────────── */
+.exercise-active {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.exercise-header-active {
+  text-align: center;
+  padding: var(--space-6) 0 var(--space-4);
+}
+.exercise-phase {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--space-3);
+}
+.exercise-title-active {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  margin-bottom: var(--space-3);
+}
+.exercise-objective {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.instruction-card {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
+}
+.instruction-step {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.instruction-step:last-child { border-bottom: none; padding-bottom: 0; }
+.instruction-step:first-child { padding-top: 0; }
+.step-number {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+.step-highlight {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.text-to-read {
+  padding: var(--space-6);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.8;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.tips-card {
+  padding: var(--space-5);
+  background: var(--purple-glow);
+  border: 1px solid rgba(167,139,250,0.15);
+  border-radius: var(--radius-lg);
+  display: flex;
+  gap: var(--space-3);
+}
+.tips-icon { font-size: 18px; flex-shrink: 0; }
+.tips-content {}
+.tips-title { font-size: 12px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: var(--space-2); }
+.tips-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+/* ── VISUAL EXERCISE ILLUSTRATIONS ─────────── */
+.mouth-illustration {
+  position: relative;
+  width: 200px; height: 160px;
+  margin: 0 auto;
+}
+.mouth-svg { width: 100%; height: 100%; }
+
+.phoneme-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-width: 80px;
+}
+.phoneme-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.phoneme-char {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.phoneme-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* ── RECORDING PLAYBACK ─────────────────────── */
+.recording-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+.recording-item:hover { border-color: var(--border); }
+.recording-play-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  border: 1px solid rgba(79,127,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+.recording-play-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+.recording-info { flex: 1; }
+.recording-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.recording-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.recording-mini-wave {
+  width: 80px; height: 24px;
+  opacity: 0.4;
+}
+
+/* ── AUDIO PLAYBACK BAR ─────────────────────── */
+.audio-player-bar {
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.audio-progress-track {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.audio-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: var(--radius-full);
+  transition: width 0.1s linear;
+}
+.audio-time {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── TABS ───────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 2px;
+}
+.tab-item {
+  flex: 1;
+  padding: var(--space-2) var(--space-4);
+  border-radius: calc(var(--radius-md) - 3px);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--transition-fast);
+  border: none;
+  background: transparent;
+}
+.tab-item.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+.tab-item:hover:not(.active) { color: var(--text-secondary); }
+
+/* ── MOBILE BOTTOM NAV ──────────────────────── */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 64px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  padding: 0 var(--space-4);
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  border: none; background: transparent;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  min-width: 52px;
+}
+.mobile-nav-item.active { color: var(--accent); }
+.mobile-nav-item svg { width: 22px; height: 22px; }
+
+/* ── ACHIEVEMENT BADGE ──────────────────────── */
+.achievement-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  min-width: 100px;
+  transition: all var(--transition-base);
+}
+.achievement-badge.unlocked {
+  border-color: rgba(251,191,36,0.25);
+  background: var(--amber-soft);
+}
+.achievement-badge.locked { opacity: 0.4; }
+.achievement-icon { font-size: 28px; }
+.achievement-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+
+/* ── TOAST NOTIFICATION ─────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: 9000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  pointer-events: none;
+}
+.toast {
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: all;
+  animation: toastIn var(--transition-spring) forwards;
+  max-width: 320px;
+}
+.toast.success { border-color: rgba(52,211,153,0.2); }
+.toast.success::before { content: '✓'; color: var(--green); font-size: 16px; font-weight: 700; }
+.toast.info::before { content: '→'; color: var(--accent); font-size: 16px; }
+@keyframes toastIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ── MODAL ──────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  padding: var(--space-5);
+  opacity: 0; visibility: hidden;
+  transition: all var(--transition-base);
+}
+.modal-overlay.open { opacity: 1; visibility: visible; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.96) translateY(8px);
+  transition: transform var(--transition-spring);
+}
+.modal-overlay.open .modal { transform: scale(1) translateY(0); }
+
+.modal-header {
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.modal-body { padding: var(--space-6); }
+.modal-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+  display: flex; gap: var(--space-3); justify-content: flex-end;
+}
+
+/* ── EMPTY STATE ────────────────────────────── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-8);
+  text-align: center;
+  gap: var(--space-4);
+}
+.empty-icon { font-size: 40px; opacity: 0.4; }
+.empty-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.empty-desc { font-size: 14px; color: var(--text-secondary); max-width: 300px; line-height: 1.6; }
+
+/* ── FORM ELEMENTS ──────────────────────────── */
+.form-group { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-5); }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.02em; }
+.form-input {
+  width: 100%;
+  padding: 10px var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: border-color var(--transition-fast);
+  outline: none;
+}
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.form-input::placeholder { color: var(--text-muted); }
+
+/* ── ONBOARDING ─────────────────────────────── */
+.onboarding-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-base);
+  padding: var(--space-6);
+}
+.onboarding-card {
+  width: 100%; max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-8);
+  box-shadow: var(--shadow-lg);
+}
+.onboarding-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+  justify-content: center;
+}
+.onboarding-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  text-align: center;
+  margin-bottom: var(--space-2);
+}
+.onboarding-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: var(--space-8);
+}
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-5) 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+/* ── UTILITY ────────────────────────────────── */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+.mt-2 { margin-top: var(--space-2); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+.hidden { display: none !important; }
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent); }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 11px; }
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+.font-bold { font-weight: 700; }
+.rounded-full { border-radius: var(--radius-full); }
+
+/* ── SCROLLBAR ──────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── FOCUS VISIBLE ──────────────────────────── */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ── ANIMATIONS ─────────────────────────────── */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+.animate-in { animation: fadeIn var(--transition-base) forwards; }
+.page-enter { animation: fadeIn var(--transition-base) forwards; }
+
+/* ── RESPONSIVE ─────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar    { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+
+  .main-content { margin-left: 0; }
+
+  .mobile-topbar { display: flex; }
+  .mobile-nav    { display: flex; }
+
+  .page-content  { padding: var(--space-5); padding-bottom: 80px; }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .exercise-grid { grid-template-columns: 1fr; }
+
+  .timer-display { font-size: 40px; }
+
+  .top-bar { display: none; }
+
+  .toast-container { bottom: 80px; right: var(--space-4); left: var(--space-4); }
+  .toast { max-width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <!-- Loading screen -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-logo">
+        <div class="logo-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <path d="M8 20 Q14 10 20 20 Q26 30 32 20" stroke="#4F7FFF" stroke-width="2.5" stroke-linecap="round" fill="none" class="wave-anim"/>
+          </svg>
+        </div>
+        <span class="logo-text">VoixClaire</span>
+      </div>
+      <div class="loading-bar"><div class="loading-fill"></div></div>
+    </div>
+  </div>
+  
+  <script>
+
+/* ===== src/data/exercises.js ===== */
+// ============================================
+// VOIXCLAIRE — BIBLIOTHÈQUE D'EXERCICES
+// Données structurées pour tous les exercices
+// ============================================
+
+const EXERCISE_CATEGORIES = {
+  WARMUP:      { id: 'warmup',      label: 'Échauffement',      emoji: '🌀', color: '#4F7FFF' },
+  BREATHING:   { id: 'breathing',   label: 'Respiration',       emoji: '🌬️', color: '#34D399' },
+  SYLLABLES:   { id: 'syllables',   label: 'Syllabes',          emoji: '🔤', color: '#A78BFA' },
+  DICTION:     { id: 'diction',     label: 'Diction',           emoji: '🎯', color: '#FBBF24' },
+  TONGUETW:    { id: 'tonguetw',    label: 'Virelangues',       emoji: '🌀', color: '#F87171' },
+  RHYTHM:      { id: 'rhythm',      label: 'Rythme & Débit',    emoji: '🥁', color: '#4F7FFF' },
+  PROJECTION:  { id: 'projection',  label: 'Projection',        emoji: '📢', color: '#34D399' },
+  READING:     { id: 'reading',     label: 'Lecture guidée',    emoji: '📖', color: '#A78BFA' },
+};
+
+const EXERCISES = [
+  // ── ÉCHAUFFEMENTS ─────────────────────────────
+  {
+    id: 'warm-jaw',
+    category: 'warmup',
+    title: 'Détente de la mâchoire',
+    objective: 'Relâcher les tensions musculaires qui bloquent l\'articulation.',
+    difficulty: 1,
+    duration: 120,
+    reps: 8,
+    emoji: '😮',
+    description: 'La mâchoire tendue est l\'ennemi numéro un d\'une diction claire. Cet exercice libère les muscles massétériques.',
+    instructions: [
+      { text: 'Ouvrez la bouche le plus grand possible, maintenez 2 secondes.' },
+      { text: 'Bougez la mâchoire de gauche à droite, 4 fois dans chaque sens.' },
+      { text: 'Faites des cercles lents avec la mâchoire, 4 fois dans chaque sens.' },
+      { text: 'Posez les mains sur les joues, sentez les muscles se relâcher.' },
+    ],
+    tips: 'Faites cet exercice devant un miroir. Votre mâchoire doit tomber librement, sans forcer.',
+    visual: {
+      type: 'mouth',
+      positions: ['open', 'wide', 'relaxed']
+    }
+  },
+  {
+    id: 'warm-lips',
+    category: 'warmup',
+    title: 'Activation des lèvres',
+    objective: 'Réveiller la mobilité des lèvres pour des consonnes nettes.',
+    difficulty: 1,
+    duration: 90,
+    reps: 10,
+    emoji: '💋',
+    description: 'Des lèvres actives produisent des consonnes labiales claires — P, B, M, F, V.',
+    instructions: [
+      { text: 'Faites vibrer les lèvres comme un cheval qui souffle (pfffrr).' },
+      { text: 'Exagérez le sourire puis le baiser — alternez 10 fois.' },
+      { text: 'Prononcez lentement : [ba][ba][ba] en exagérant chaque mouvement.' },
+      { text: 'Tapotez doucement les lèvres du bout des doigts pour les dynamiser.' },
+    ],
+    tips: 'Plus vous exagérez les mouvements à l\'entraînement, plus vos gestes seront précis en situation réelle.',
+    visual: {
+      type: 'lips',
+      positions: ['smile', 'pout', 'neutral']
+    }
+  },
+  {
+    id: 'warm-tongue',
+    category: 'warmup',
+    title: 'Mobilité de la langue',
+    objective: 'Activer la précision de la langue pour des consonnes dentales et alvéolaires.',
+    difficulty: 2,
+    duration: 120,
+    reps: 8,
+    emoji: '👅',
+    description: 'La langue est le muscle le plus actif de la parole. Son agilité détermine la clarté de T, D, N, L, R, S, Z.',
+    instructions: [
+      { text: 'Sortez la langue et montez-la vers le nez, descendez vers le menton — 6 fois.' },
+      { text: 'Touchez l\'angle droit puis gauche de la bouche avec la pointe — 8 fois.' },
+      { text: 'Faites le tour complet des lèvres avec la langue, sens horaire puis anti-horaire.' },
+      { text: 'Claquement : collezla langue au palais, décollezla brusquement — 10 fois.' },
+    ],
+    tips: 'La pointe de la langue doit rester ferme et précise, pas molle. Imaginez qu\'elle "dessine" chaque mouvement.',
+  },
+
+  // ── RESPIRATION ───────────────────────────────
+  {
+    id: 'breath-diaphragm',
+    category: 'breathing',
+    title: 'Respiration diaphragmatique',
+    objective: 'Maîtriser le souffle pour soutenir la voix sans tension.',
+    difficulty: 1,
+    duration: 180,
+    reps: 6,
+    emoji: '🫁',
+    description: 'La respiration abdominale est le fondement de toute bonne élocution. Sans elle, la voix se fatigue et l\'articulation se dégrade.',
+    instructions: [
+      { text: 'Posez une main sur le ventre, une sur la poitrine. La poitrine ne doit pas bouger.' },
+      { text: 'Inspirez 4 secondes par le nez — le ventre se gonfle vers l\'avant.' },
+      { text: 'Bloquez 2 secondes, sans crispation.' },
+      { text: 'Expirez 6 secondes par la bouche — le ventre rentre doucement.' },
+    ],
+    tips: 'Les épaules restent basses et détendues. La cage thoracique ne monte pas. Si vous bâillez, c\'est normal — votre corps s\'oxygène.',
+    timerPattern: [4, 2, 6],
+    timerLabels: ['Inspirez', 'Bloquez', 'Expirez'],
+  },
+  {
+    id: 'breath-support',
+    category: 'breathing',
+    title: 'Soutien du souffle',
+    objective: 'Apprendre à doser son souffle pour maintenir une voix stable et projetée.',
+    difficulty: 2,
+    duration: 150,
+    reps: 5,
+    emoji: '💨',
+    description: 'Le soutien du souffle empêche la voix de "tomber" en fin de phrase.',
+    instructions: [
+      { text: 'Inspirez profondément par le nez en 3 secondes.' },
+      { text: 'Soufflez sur un [sss] long et régulier le plus longtemps possible — objectif 15s.' },
+      { text: 'Recommencez avec [fff], puis [vvv].' },
+      { text: 'Lisez une phrase longue en une seule inspiration, sans accélérer à la fin.' },
+    ],
+    tips: 'Imaginez que votre souffle est un filet d\'eau régulier, pas une rafale. La régularité prime sur la durée.',
+    text: 'La clarté de la parole vient de l\'harmonie entre le souffle, la voix et la précision des mouvements articulatoires.',
+  },
+
+  // ── SYLLABES ──────────────────────────────────
+  {
+    id: 'syll-plosives',
+    category: 'syllables',
+    title: 'Consonnes plosives',
+    objective: 'Articuler nettement les consonnes P, B, T, D, K, G.',
+    difficulty: 1,
+    duration: 120,
+    reps: 20,
+    emoji: '💥',
+    description: 'Les plosives — consonnes qui "explosent" — donnent du punch et de la netteté à la parole.',
+    instructions: [
+      { text: 'Répétez chaque série 5 fois à vitesse lente, puis 5 fois à vitesse normale :', highlight: true },
+      { text: '[pa-pa-pa] [ba-ba-ba] [ta-ta-ta] [da-da-da] [ka-ka-ka] [ga-ga-ga]' },
+      { text: 'Sentez l\'explosion d\'air sur chaque plosive. Le P et T doivent faire un petit souffle sur votre main.' },
+      { text: 'Enchaînez : [pa-ta-ka] [ba-da-ga] — d\'abord lent, puis progressivement plus rapide.' },
+    ],
+    tips: 'Posez votre main devant la bouche. Vous devez sentir chaque explosion d\'air. Si ce n\'est pas le cas, votre articulation manque de précision.',
+    text: 'pa-pa-pa — ba-ba-ba — ta-ta-ta — da-da-da — ka-ka-ka — ga-ga-ga',
+  },
+  {
+    id: 'syll-fricatives',
+    category: 'syllables',
+    title: 'Fricatives sifflantes',
+    objective: 'Préciser les sons S, Z, CH, J, F, V.',
+    difficulty: 2,
+    duration: 120,
+    reps: 15,
+    emoji: '🌊',
+    description: 'Les fricatives imprécises créent une impression de zézaiement, de flou sonore ou de bruit parasite.',
+    instructions: [
+      { text: 'Répétez en isolant bien chaque son :', highlight: true },
+      { text: '[sa-si-su-se-so] puis [za-zi-zu-ze-zo]' },
+      { text: '[cha-chi-chu-che-cho] puis [ja-ji-ju-je-jo]' },
+      { text: 'Alternez S et Z dans une même série : [sa-za-sa-za] pour sentir la différence.' },
+    ],
+    tips: 'Le S est sourd (sans voix), le Z est voisé (la gorge vibre). Posez deux doigts sur votre gorge pour sentir la différence.',
+    text: 'sa-si-su-se-so — za-zi-zu-ze-zo — cha-chi-chu-che-cho',
+  },
+
+  // ── DICTION ───────────────────────────────────
+  {
+    id: 'dict-phrases',
+    category: 'diction',
+    title: 'Phrases de diction classiques',
+    objective: 'Travailler l\'enchaînement fluide des sons dans la phrase.',
+    difficulty: 2,
+    duration: 240,
+    reps: 3,
+    emoji: '🎯',
+    description: 'Ces phrases ciblent les points de diction les plus fréquents en français.',
+    instructions: [
+      { text: 'Lisez chaque phrase d\'abord lentement, en articulant chaque syllabe.' },
+      { text: 'Puis à vitesse normale en maintenant la clarté.' },
+      { text: 'Enfin, légèrement plus vite, sans perdre en précision.' },
+      { text: 'Enregistrez-vous et réécoutez pour détecter les zones floues.' },
+    ],
+    tips: 'La précision prime sur la vitesse. Mieux vaut lire lentement et distinctement que vite et approximativement.',
+    text: 'Les longs soupirs des violons de l\'automne blessent mon cœur d\'une langueur monotone.',
+  },
+  {
+    id: 'dict-liaison',
+    category: 'diction',
+    title: 'Liaisons et enchaînements',
+    objective: 'Maîtriser les liaisons pour un débit fluide et naturel.',
+    difficulty: 3,
+    duration: 180,
+    reps: 5,
+    emoji: '🔗',
+    description: 'Les liaisons incorrectes ou manquantes trahissent un manque de maîtrise de la langue orale.',
+    instructions: [
+      { text: 'Lisez en faisant les liaisons obligatoires (marquées avec un •) :', highlight: true },
+      { text: 'Vous•avez — nous•avons — c\'est•une — les•enfants' },
+      { text: 'Évitez les liaisons interdites : "et•il" est incorrect — dites "et il" séparé.' },
+      { text: 'Pratiquez avec la phrase complète à vitesse normale.' },
+    ],
+    text: 'Les enfants ont appris à lire avec enthousiasme et attention pendant toute une année.',
+  },
+
+  // ── VIRELANGUES ───────────────────────────────
+  {
+    id: 'tongue-classic',
+    category: 'tonguetw',
+    title: 'Virelangue classique',
+    objective: 'Entraîner la rapidité et la précision articulatoire.',
+    difficulty: 3,
+    duration: 120,
+    reps: 5,
+    emoji: '🌀',
+    description: 'Le virelangue est l\'exercice d\'agilité par excellence — il révèle et corrige les zones d\'imprécision.',
+    instructions: [
+      { text: 'Commencez très lentement — chaque syllabe doit être parfaitement nette.' },
+      { text: 'Augmentez progressivement la vitesse sur 3 passages.' },
+      { text: 'Si vous trébuchez, ralentissez et recommencez depuis le début.' },
+      { text: 'Objectif : le dire 3 fois de suite rapidement sans erreur.' },
+    ],
+    tips: 'Un virelangue mal prononcé vite ne sert à rien. La vitesse vient de la répétition — pas de la précipitation.',
+    text: 'Un chasseur sachant chasser doit savoir chasser sans son chien.',
+  },
+  {
+    id: 'tongue-r',
+    category: 'tonguetw',
+    title: 'Virelangue — le R roulé',
+    objective: 'Travailler le R uvulaire français dans des contextes consonantiques difficiles.',
+    difficulty: 4,
+    duration: 120,
+    reps: 5,
+    emoji: '🎲',
+    description: 'Le R est l\'une des consonnes les plus difficiles du français. Cet exercice le travaille dans les enchaînements les plus exigeants.',
+    instructions: [
+      { text: 'Faites vibrer légèrement le fond de la gorge — c\'est la position du R.' },
+      { text: 'Répétez : [ra-re-ri-ro-ru] en maintenant la vibration uvulaire.' },
+      { text: 'Puis la phrase complète, lentement d\'abord.' },
+    ],
+    text: 'Rat des villes et rat des champs se rencontrèrent rien qu\'à la rentrée.',
+  },
+
+  // ── RYTHME ────────────────────────────────────
+  {
+    id: 'rhythm-slow',
+    category: 'rhythm',
+    title: 'Débit lent et contrôlé',
+    objective: 'Apprendre à parler lentement sans paraître hésitant.',
+    difficulty: 2,
+    duration: 180,
+    reps: 3,
+    emoji: '🐢',
+    description: 'Parler lentement est un art. La plupart des gens confondent lenteur et hésitation. Ce sont deux choses distinctes.',
+    instructions: [
+      { text: 'Lisez le texte à voix haute avec exactement 1 seconde entre chaque groupe de mots.' },
+      { text: 'Marquez une vraie pause aux virgules, une plus longue aux points.' },
+      { text: 'Ne remplissez jamais les silences avec des "euh" — assumez les pauses.' },
+      { text: 'Enregistrez-vous et vérifiez : vous semblez-vous calme et maître de vous ?' },
+    ],
+    tips: 'Les grands orateurs parlent moins vite que vous ne le pensez. Le silence entre les phrases donne du poids aux mots.',
+    text: 'La clarté de l\'expression suppose la clarté de la pensée. Avant de parler, prenez le temps de formuler votre idée.',
+  },
+  {
+    id: 'rhythm-metronome',
+    category: 'rhythm',
+    title: 'Lecture sur métronome',
+    objective: 'Stabiliser le débit et éviter les accélérations involontaires.',
+    difficulty: 3,
+    duration: 240,
+    reps: 3,
+    emoji: '🎵',
+    description: 'L\'accélération involontaire en fin de phrase est l\'un des défauts les plus communs. Le métronome aide à en prendre conscience.',
+    instructions: [
+      { text: 'Activez le métronome intégré (tempo 60 BPM).' },
+      { text: 'Lisez une syllabe par battement — d\'abord à 60, puis à 80, puis librement.' },
+      { text: 'L\'objectif est de garder un débit régulier, pas de synchroniser chaque mot.' },
+      { text: 'Après l\'exercice, lisez sans métronome en gardant cette sensation de régularité.' },
+    ],
+    text: 'Chaque mot mérite d\'être prononcé avec la même attention que le premier.',
+    hasMetronome: true,
+  },
+
+  // ── PROJECTION ────────────────────────────────
+  {
+    id: 'proj-resonance',
+    category: 'projection',
+    title: 'Résonance et placement de voix',
+    objective: 'Trouver la résonance naturelle pour une voix qui porte sans effort.',
+    difficulty: 2,
+    duration: 180,
+    reps: 6,
+    emoji: '🔔',
+    description: 'Une voix bien placée porte loin sans forcer. Le secret est dans la résonance des cavités faciales, pas dans la puissance.',
+    instructions: [
+      { text: 'Hummmm sur une note confortable — sentez les vibrations dans la poitrine, puis le nez, puis le front.' },
+      { text: 'Ouvrez progressivement sur [mmmmmaa] — la vibration reste en avant du visage.' },
+      { text: 'Répétez [ma-me-mi-mo-mu] en maintenant la vibration "devant".' },
+      { text: 'Lisez le texte avec cette sensation de voix "appuyée sur les dents de devant".' },
+    ],
+    tips: 'La voix projetée n\'est pas une voix forte. C\'est une voix qui se place naturellement "vers l\'avant" grâce à la résonance.',
+    text: 'Ma voix avance dans l\'espace comme une présence naturelle et assurée.',
+  },
+  {
+    id: 'proj-clarity',
+    category: 'projection',
+    title: 'Clarté vocale maximale',
+    objective: 'Produire une voix parfaitement intelligible dans toutes les conditions.',
+    difficulty: 3,
+    duration: 240,
+    reps: 4,
+    emoji: '💎',
+    description: 'Exercice final de synthèse — il mobilise tout ce qui a été travaillé : souffle, articulation, résonance, rythme.',
+    instructions: [
+      { text: 'Lisez le texte debout, dos droit, regard légèrement en avant.' },
+      { text: 'Respirez profondément avant chaque phrase.' },
+      { text: 'Articulez chaque consonne finale — ne les avalez pas.' },
+      { text: 'Enregistrez et comparez avec une session précédente.' },
+    ],
+    tips: 'La clarté vocale n\'est pas une performance, c\'est une habitude. Chaque session vous rapproche de votre voix idéale.',
+    text: 'La précision de la parole est un reflet de la précision de la pensée. Celui qui parle clairement pense clairement.',
+  },
+];
+
+const DAILY_OBJECTIVES = [
+  { id: 'do-1', text: 'Compléter 3 exercices aujourd\'hui', xp: 30 },
+  { id: 'do-2', text: 'Enregistrer une session vocale', xp: 20 },
+  { id: 'do-3', text: 'Pratiquer 15 minutes en continu', xp: 25 },
+  { id: 'do-4', text: 'Essayer un virelangue', xp: 15 },
+];
+
+const ACHIEVEMENTS = [
+  { id: 'first-session',  icon: '🎙️', name: 'Première voix',    desc: 'Compléter votre 1ère session' },
+  { id: 'streak-3',       icon: '🔥', name: 'En feu',            desc: '3 jours consécutifs' },
+  { id: 'streak-7',       icon: '⚡', name: 'Semaine parfaite',  desc: '7 jours consécutifs' },
+  { id: 'ex-10',          icon: '🏆', name: 'Assidu',            desc: '10 exercices complétés' },
+  { id: 'ex-50',          icon: '💎', name: 'Expert',            desc: '50 exercices complétés' },
+  { id: 'recording-5',    icon: '🎵', name: 'Mélomane',          desc: '5 enregistrements réalisés' },
+  { id: 'score-80',       icon: '⭐', name: 'Qualité vocale',    desc: 'Score moyen > 80' },
+  { id: 'minutes-60',     icon: '⏱️', name: 'Persévérant',       desc: '60 minutes d\'entraînement' },
+];
+
+const SAMPLE_SESSIONS = [
+  {
+    id: 's1', date: new Date(Date.now() - 86400000),
+    name: 'Session du matin', duration: 18, exercisesCount: 4, score: 76,
+    exercises: ['warm-jaw', 'warm-lips', 'syll-plosives', 'dict-phrases']
+  },
+  {
+    id: 's2', date: new Date(Date.now() - 172800000),
+    name: 'Session virelangues', duration: 12, exercisesCount: 3, score: 68,
+    exercises: ['warm-tongue', 'tongue-classic', 'tongue-r']
+  },
+  {
+    id: 's3', date: new Date(Date.now() - 259200000),
+    name: 'Respiration & Projection', duration: 22, exercisesCount: 4, score: 81,
+    exercises: ['breath-diaphragm', 'breath-support', 'proj-resonance', 'proj-clarity']
+  },
+];
+
+
+/* ===== src/lib/ui.js ===== */
+// ============================================
+// VOIXCLAIRE — UI HELPERS & ICONS
+// Composants HTML, icônes SVG, utilitaires
+// ============================================
+
+// ── SVG ICONS ──────────────────────────────── 
+const Icons = {
+  dashboard: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`,
+  exercises: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+  mic: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`,
+  stats: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+  settings: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
+  play: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>`,
+  pause: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>`,
+  stop: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`,
+  chevronRight: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>`,
+  chevronLeft: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>`,
+  check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+  x: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+  flame: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 01-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>`,
+  clock: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+  repeat: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>`,
+  trophy: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 12 21 16 21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M17 4H7v8a5 5 0 0010 0V4z"/><path d="M7 4H5a2 2 0 00-2 2v1a4 4 0 004 4h0"/><path d="M17 4h2a2 2 0 012 2v1a4 4 0 01-4 4h0"/></svg>`,
+  waveform: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12h2l3-8 3 16 3-8 3 4 2-4 2 4h2"/></svg>`,
+  menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`,
+  target: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  star: `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+  arrowUp: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`,
+  user: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  logout: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+};
+
+// ── TOAST SYSTEM ─────────────────────────────
+let toastContainer;
+
+function getToastContainer() {
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container';
+    document.body.appendChild(toastContainer);
+  }
+  return toastContainer;
+}
+
+function showToast(message, type = 'info', duration = 3500) {
+  const container = getToastContainer();
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(20px)';
+    toast.style.transition = 'all 300ms';
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// ── MODAL SYSTEM ─────────────────────────────
+let activeModal = null;
+
+function openModal(config) {
+  closeModal();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">${config.title}</div>
+          ${config.subtitle ? `<div class="text-sm text-secondary mt-2">${config.subtitle}</div>` : ''}
+        </div>
+        <button class="btn btn-ghost btn-icon" id="modal-close" aria-label="Fermer">
+          ${Icons.x}
+        </button>
+      </div>
+      <div class="modal-body">${config.content || ''}</div>
+      ${config.footer ? `<div class="modal-footer">${config.footer}</div>` : ''}
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('open'));
+
+  overlay.querySelector('#modal-close').onclick = closeModal;
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); }, { once: true });
+
+  activeModal = overlay;
+  if (config.onOpen) config.onOpen(overlay);
+  return overlay;
+}
+
+function closeModal() {
+  if (!activeModal) return;
+  activeModal.classList.remove('open');
+  setTimeout(() => activeModal?.remove(), 300);
+  activeModal = null;
+}
+
+// ── DIFFICULTY STARS ─────────────────────────
+function renderDifficulty(level, max = 5) {
+  const dots = Array.from({ length: max }, (_, i) =>
+    `<span${i < level ? ' class="active"' : ''}></span>`
+  ).join('');
+  return `<div class="difficulty-dot">${dots}</div>`;
+}
+
+// ── PROGRESS RING SVG ─────────────────────────
+function progressRingSVG(percent, size = 120, strokeWidth = 4) {
+  const r  = (size - strokeWidth * 2) / 2;
+  const c  = 2 * Math.PI * r;
+  const offset = c - (percent / 100) * c;
+
+  return `
+    <svg width="${size}" height="${size}" class="progress-ring">
+      <defs>
+        <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#4F7FFF"/>
+          <stop offset="100%" style="stop-color:#A78BFA"/>
+        </linearGradient>
+      </defs>
+      <circle
+        class="progress-ring-track"
+        cx="${size/2}" cy="${size/2}" r="${r}"
+        stroke-width="${strokeWidth}"
+      />
+      <circle
+        class="progress-ring-fill"
+        cx="${size/2}" cy="${size/2}" r="${r}"
+        stroke-width="${strokeWidth}"
+        stroke-dasharray="${c}"
+        stroke-dashoffset="${offset}"
+        transform="rotate(-90 ${size/2} ${size/2})"
+      />
+    </svg>
+  `;
+}
+
+// ── SCORE COLOR ──────────────────────────────
+function scoreColor(score) {
+  if (score >= 80) return 'var(--green)';
+  if (score >= 60) return 'var(--accent)';
+  if (score >= 40) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+// ── DATE HELPERS ─────────────────────────────
+function relativeDate(date) {
+  const now = new Date();
+  const d   = new Date(date);
+  const diff = now - d;
+  const hours = diff / 3600000;
+
+  if (hours < 1)  return 'Il y a quelques minutes';
+  if (hours < 24) return `Il y a ${Math.round(hours)}h`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'Hier';
+  if (days < 7)  return `Il y a ${days} jours`;
+  return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+// ── CATEGORY COLOR ───────────────────────────
+function categoryColor(cat) {
+  const colors = {
+    warmup:     '#4F7FFF',
+    breathing:  '#34D399',
+    syllables:  '#A78BFA',
+    diction:    '#FBBF24',
+    tonguetw:   '#F87171',
+    rhythm:     '#4F7FFF',
+    projection: '#34D399',
+    reading:    '#A78BFA',
+  };
+  return colors[cat] || '#4F7FFF';
+}
+
+// ── WEEK DAYS ────────────────────────────────
+const DAYS_SHORT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+function getTodayIndex() {
+  return (new Date().getDay() + 6) % 7; // 0 = lundi
+}
+
+
+/* ===== src/lib/store.js ===== */
+// ============================================
+// VOIXCLAIRE — STATE & STORAGE MANAGEMENT
+// Gestion d'état local (Firebase-ready)
+// ============================================
+
+const STORAGE_KEY = 'voixclaire_v1';
+
+const DEFAULT_STATE = {
+  user: null,
+  sessions: [],
+  recordings: [],
+  stats: {
+    totalMinutes: 0,
+    totalSessions: 0,
+    totalExercises: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    averageScore: 0,
+    weeklyData: [0, 0, 0, 0, 0, 0, 0], // minutes per day, Mon–Sun
+    exerciseScores: {},
+  },
+  achievements: [],
+  goals: {
+    dailyMinutes: 15,
+    weeklyDays: 5,
+    targetExercises: ['warm-jaw', 'breath-diaphragm', 'dict-phrases'],
+  },
+  preferences: {
+    theme: 'dark',
+    audioInput: null,
+    dailyReminder: false,
+    reminderTime: '08:00',
+    showTips: true,
+  },
+  onboarded: false,
+};
+
+class Store {
+  constructor() {
+    this._state = this._load();
+    this._listeners = new Map();
+  }
+
+  _load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return structuredClone(DEFAULT_STATE);
+      const parsed = JSON.parse(raw);
+      // Parse dates in sessions
+      if (parsed.sessions) {
+        parsed.sessions = parsed.sessions.map(s => ({ ...s, date: new Date(s.date) }));
+      }
+      return { ...structuredClone(DEFAULT_STATE), ...parsed };
+    } catch {
+      return structuredClone(DEFAULT_STATE);
+    }
+  }
+
+  _save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this._state));
+    } catch (e) {
+      console.warn('VoixClaire: Impossible de sauvegarder l\'état.', e);
+    }
+  }
+
+  get(key) {
+    if (!key) return this._state;
+    return key.split('.').reduce((obj, k) => obj?.[k], this._state);
+  }
+
+  set(key, value) {
+    const keys = key.split('.');
+    const last = keys.pop();
+    const target = keys.reduce((obj, k) => obj[k], this._state);
+    target[last] = value;
+    this._save();
+    this._notify(key, value);
+  }
+
+  update(key, fn) {
+    const current = this.get(key);
+    this.set(key, fn(current));
+  }
+
+  // ── EVENTS ──────────────────────────────────
+  on(event, listener) {
+    if (!this._listeners.has(event)) this._listeners.set(event, new Set());
+    this._listeners.get(event).add(listener);
+    return () => this._listeners.get(event)?.delete(listener);
+  }
+
+  _notify(key, value) {
+    this._listeners.get(key)?.forEach(fn => fn(value));
+    this._listeners.get('*')?.forEach(fn => fn(key, value));
+  }
+
+  // ── USER ────────────────────────────────────
+  login(userData) {
+    this.set('user', { ...userData, loginAt: new Date().toISOString() });
+    this.set('onboarded', true);
+  }
+
+  logout() {
+    this.set('user', null);
+  }
+
+  isLoggedIn() {
+    return !!this._state.user;
+  }
+
+  // ── SESSIONS ────────────────────────────────
+  addSession(session) {
+    const s = {
+      id: crypto.randomUUID?.() || Date.now().toString(36),
+      date: new Date(),
+      ...session,
+    };
+    this.update('sessions', sessions => [s, ...sessions]);
+    this._updateStats(s);
+    this._checkAchievements();
+    return s;
+  }
+
+  getSessions(limit = 10) {
+    return [...this._state.sessions]
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .slice(0, limit);
+  }
+
+  // ── RECORDINGS ─────────────────────────────
+  addRecording(recording) {
+    const r = {
+      id: crypto.randomUUID?.() || Date.now().toString(36),
+      createdAt: new Date().toISOString(),
+      ...recording,
+    };
+    this.update('recordings', recs => [r, ...recs]);
+    return r;
+  }
+
+  getRecordings(exerciseId) {
+    const all = this._state.recordings;
+    return exerciseId ? all.filter(r => r.exerciseId === exerciseId) : all;
+  }
+
+  // ── STATS ───────────────────────────────────
+  _updateStats(session) {
+    const stats = { ...this._state.stats };
+    stats.totalMinutes    += session.duration || 0;
+    stats.totalSessions   += 1;
+    stats.totalExercises  += session.exercisesCount || 0;
+
+    // Score moyen (moyenne mobile)
+    if (session.score) {
+      const prevTotal = stats.averageScore * (stats.totalSessions - 1);
+      stats.averageScore = Math.round((prevTotal + session.score) / stats.totalSessions);
+    }
+
+    // Streak
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const sessions = this._state.sessions;
+    if (sessions.length <= 1) {
+      stats.currentStreak = 1;
+    } else {
+      // Vérifier si hier on avait une session
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const hadYesterday = sessions.some(s => {
+        const d = new Date(s.date);
+        d.setHours(0,0,0,0);
+        return d.getTime() === yesterday.getTime();
+      });
+      stats.currentStreak = hadYesterday ? stats.currentStreak + 1 : 1;
+    }
+    stats.longestStreak = Math.max(stats.longestStreak, stats.currentStreak);
+
+    // Weekly data
+    const dayOfWeek = (new Date().getDay() + 6) % 7; // 0=Mon
+    stats.weeklyData = [...(stats.weeklyData || [0,0,0,0,0,0,0])];
+    stats.weeklyData[dayOfWeek] += Math.round((session.duration || 0) / 60);
+
+    this.set('stats', stats);
+  }
+
+  _checkAchievements() {
+    const stats = this._state.stats;
+    const unlocked = new Set(this._state.achievements);
+    const toUnlock = [];
+
+    if (stats.totalSessions >= 1  && !unlocked.has('first-session')) toUnlock.push('first-session');
+    if (stats.currentStreak >= 3  && !unlocked.has('streak-3'))      toUnlock.push('streak-3');
+    if (stats.currentStreak >= 7  && !unlocked.has('streak-7'))      toUnlock.push('streak-7');
+    if (stats.totalExercises >= 10 && !unlocked.has('ex-10'))        toUnlock.push('ex-10');
+    if (stats.totalExercises >= 50 && !unlocked.has('ex-50'))        toUnlock.push('ex-50');
+    if (stats.averageScore >= 80  && !unlocked.has('score-80'))      toUnlock.push('score-80');
+    if (stats.totalMinutes >= 60  && !unlocked.has('minutes-60'))    toUnlock.push('minutes-60');
+    if (this._state.recordings.length >= 5 && !unlocked.has('recording-5')) toUnlock.push('recording-5');
+
+    if (toUnlock.length) {
+      this.update('achievements', ach => [...ach, ...toUnlock]);
+      return toUnlock;
+    }
+    return [];
+  }
+
+  // ── TODAY ─────────────────────────────────
+  getTodaySessions() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    return this._state.sessions.filter(s => {
+      const d = new Date(s.date);
+      d.setHours(0,0,0,0);
+      return d.getTime() === today.getTime();
+    });
+  }
+
+  getTodayMinutes() {
+    return this.getTodaySessions().reduce((sum, s) => sum + (s.duration || 0), 0);
+  }
+
+  // ── RESET (DEV) ─────────────────────────────
+  reset() {
+    this._state = structuredClone(DEFAULT_STATE);
+    this._save();
+    window.location.reload();
+  }
+}
+
+const store = new Store();
+
+// ── SCORING ALGORITHM ─────────────────────────
+function computeExerciseScore(audioAnalysis, exerciseMeta) {
+  // Algorithme de scoring local basé sur les métriques Web Audio
+  // Score composite pondéré
+  const {
+    duration = 0,
+    speechRatio = 0.8,    // ratio parole/silence
+    averageAmplitude = 0.6,
+    amplitudeVariance = 0.1, // faible variance = régularité
+    pauseCount = 2,
+    estimatedSyllables = 0,
+  } = audioAnalysis;
+
+  const targetDuration = exerciseMeta.duration || 60;
+  const completionRate = Math.min(duration / targetDuration, 1);
+
+  // Critères de qualité
+  const scores = {
+    completion:    completionRate * 25,                                // /25
+    engagement:    Math.min(speechRatio * 30, 30),                    // /30
+    regularity:    Math.max(0, (1 - amplitudeVariance * 3)) * 20,    // /20
+    pausing:       Math.max(0, 1 - Math.abs(pauseCount - 3) / 5) * 15, // /15 — idéal ~3 pauses
+    projection:    Math.min(averageAmplitude * 10, 10),               // /10
+  };
+
+  const raw = Object.values(scores).reduce((s, v) => s + v, 0);
+  return {
+    total:  Math.min(Math.round(raw), 100),
+    detail: scores,
+    label:  raw >= 85 ? 'Excellent' : raw >= 70 ? 'Bien' : raw >= 55 ? 'Correct' : 'À améliorer',
+  };
+}
+
+
+/* ===== src/lib/audio.js ===== */
+// ============================================
+// VOIXCLAIRE — AUDIO ENGINE
+// Enregistrement, analyse Web Audio API
+// ============================================
+
+class AudioRecorder {
+  constructor() {
+    this.mediaRecorder = null;
+    this.stream        = null;
+    this.audioContext  = null;
+    this.analyser      = null;
+    this.chunks        = [];
+    this.startTime     = null;
+    this.animFrame     = null;
+
+    // Callbacks
+    this.onWaveformData  = null;
+    this.onTimeUpdate    = null;
+    this.onStateChange   = null;
+  }
+
+  // ── INITIALISATION ───────────────────────────
+  async init() {
+    if (this.stream) return; // Déjà initialisé
+
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 44100,
+        }
+      });
+
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const source = this.audioContext.createMediaStreamSource(this.stream);
+
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.analyser.smoothingTimeConstant = 0.8;
+      source.connect(this.analyser);
+
+      return true;
+    } catch (err) {
+      console.error('VoixClaire Audio: Accès microphone refusé.', err);
+      this.onStateChange?.('error', 'Accès au microphone refusé. Vérifiez les permissions.');
+      return false;
+    }
+  }
+
+  // ── ENREGISTREMENT ───────────────────────────
+  async start() {
+    const ready = await this.init();
+    if (!ready) return false;
+
+    this.chunks    = [];
+    this.startTime = Date.now();
+    this._metrics  = {
+      amplitudes:  [],
+      speechFrames: 0,
+      silenceFrames: 0,
+      totalFrames: 0,
+    };
+
+    try {
+      this.mediaRecorder = new MediaRecorder(this.stream, {
+        mimeType: this._getSupportedMime(),
+      });
+
+      this.mediaRecorder.ondataavailable = e => {
+        if (e.data.size > 0) this.chunks.push(e.data);
+      };
+
+      this.mediaRecorder.start(100); // Collect every 100ms
+      this._startAnalysis();
+      this.onStateChange?.('recording');
+      return true;
+    } catch (err) {
+      console.error('VoixClaire Audio: Erreur démarrage enregistrement.', err);
+      return false;
+    }
+  }
+
+  stop() {
+    return new Promise(resolve => {
+      if (!this.mediaRecorder || this.mediaRecorder.state === 'inactive') {
+        resolve(null);
+        return;
+      }
+
+      this.mediaRecorder.onstop = () => {
+        const blob = new Blob(this.chunks, { type: this.mediaRecorder.mimeType });
+        const duration = (Date.now() - this.startTime) / 1000;
+        const url = URL.createObjectURL(blob);
+        const analysis = this._computeAnalysis(duration);
+        this._stopAnalysis();
+        this.onStateChange?.('idle');
+        resolve({ blob, url, duration, analysis });
+      };
+
+      this.mediaRecorder.stop();
+    });
+  }
+
+  pause() {
+    if (this.mediaRecorder?.state === 'recording') {
+      this.mediaRecorder.pause();
+      this._stopAnalysis();
+      this.onStateChange?.('paused');
+    }
+  }
+
+  resume() {
+    if (this.mediaRecorder?.state === 'paused') {
+      this.mediaRecorder.resume();
+      this._startAnalysis();
+      this.onStateChange?.('recording');
+    }
+  }
+
+  // ── ANALYSE EN TEMPS RÉEL ────────────────────
+  _startAnalysis() {
+    const bufferLength = this.analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const tick = () => {
+      this.analyser.getByteTimeDomainData(dataArray);
+
+      // Calcul amplitude RMS
+      let sum = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const v = (dataArray[i] - 128) / 128;
+        sum += v * v;
+      }
+      const rms = Math.sqrt(sum / bufferLength);
+      const amplitude = Math.min(rms * 4, 1); // Normalisé 0–1
+
+      // Accumulation pour analyse finale
+      this._metrics.amplitudes.push(amplitude);
+      this._metrics.totalFrames++;
+      if (amplitude > 0.05) this._metrics.speechFrames++;
+      else this._metrics.silenceFrames++;
+
+      // Callback waveform (visualisation)
+      this.onWaveformData?.(dataArray, amplitude);
+
+      // Timer update
+      if (this.startTime) {
+        const elapsed = (Date.now() - this.startTime) / 1000;
+        this.onTimeUpdate?.(elapsed);
+      }
+
+      this.animFrame = requestAnimationFrame(tick);
+    };
+
+    this.animFrame = requestAnimationFrame(tick);
+  }
+
+  _stopAnalysis() {
+    if (this.animFrame) {
+      cancelAnimationFrame(this.animFrame);
+      this.animFrame = null;
+    }
+  }
+
+  // ── ANALYSE FINALE ────────────────────────────
+  _computeAnalysis(duration) {
+    const { amplitudes, speechFrames, totalFrames } = this._metrics;
+
+    if (!amplitudes.length) return null;
+
+    const avg = amplitudes.reduce((s, v) => s + v, 0) / amplitudes.length;
+    const variance = amplitudes.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / amplitudes.length;
+
+    // Détection des pauses (transitions silence→parole)
+    let pauseCount = 0;
+    let inSpeech = false;
+    for (const a of amplitudes) {
+      const isSpeech = a > 0.05;
+      if (!inSpeech && isSpeech) pauseCount++;
+      inSpeech = isSpeech;
+    }
+
+    // Estimation grossière du débit (syllabes/min)
+    // Basé sur les variations d'amplitude — approximatif
+    const estimatedSyllables = Math.round(pauseCount * 2.5);
+    const syllablesPerMinute = duration > 0 ? Math.round((estimatedSyllables / duration) * 60) : 0;
+
+    return {
+      duration,
+      averageAmplitude:  Math.round(avg * 100) / 100,
+      amplitudeVariance: Math.round(variance * 100) / 100,
+      speechRatio:       totalFrames > 0 ? Math.round((speechFrames / totalFrames) * 100) / 100 : 0,
+      pauseCount,
+      estimatedSyllables,
+      syllablesPerMinute,
+      // Note: une analyse précise de la clarté vocale nécessiterait
+      // un modèle IA (ex: Whisper + scoring) — voir architecture V2
+    };
+  }
+
+  // ── UTILITIES ────────────────────────────────
+  _getSupportedMime() {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/ogg',
+      'audio/mp4',
+    ];
+    return types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+  }
+
+  getCurrentTime() {
+    if (!this.startTime) return 0;
+    return (Date.now() - this.startTime) / 1000;
+  }
+
+  isRecording() {
+    return this.mediaRecorder?.state === 'recording';
+  }
+
+  // ── CLEANUP ──────────────────────────────────
+  destroy() {
+    this._stopAnalysis();
+    this.mediaRecorder?.stop();
+    this.stream?.getTracks().forEach(t => t.stop());
+    this.audioContext?.close();
+    this.stream        = null;
+    this.audioContext  = null;
+    this.mediaRecorder = null;
+  }
+
+  // ── PERMISSION CHECK ─────────────────────────
+  static async checkPermission() {
+    try {
+      const perm = await navigator.permissions.query({ name: 'microphone' });
+      return perm.state; // 'granted' | 'denied' | 'prompt'
+    } catch {
+      return 'prompt';
+    }
+  }
+}
+
+// ── WAVEFORM RENDERER ────────────────────────
+class WaveformRenderer {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx    = canvas.getContext('2d');
+    this.bars   = [];
+    this.maxBars = 80;
+  }
+
+  push(amplitude) {
+    this.bars.push(amplitude);
+    if (this.bars.length > this.maxBars) this.bars.shift();
+    this._draw();
+  }
+
+  _draw() {
+    const { canvas, ctx, bars } = this;
+    const { width, height } = canvas;
+    const mid = height / 2;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const barWidth  = width / this.maxBars;
+    const gap       = 1;
+
+    bars.forEach((amp, i) => {
+      const barH = Math.max(amp * mid * 2, 2);
+      const x    = i * barWidth;
+      const y    = mid - barH / 2;
+
+      // Gradient couleur selon amplitude
+      const alpha = 0.3 + amp * 0.7;
+      ctx.fillStyle = i === bars.length - 1
+        ? `rgba(248, 113, 113, ${alpha})`   // Rouge pour barre active
+        : `rgba(79, 127, 255, ${alpha})`;   // Bleu pour historique
+
+      ctx.beginPath();
+      ctx.roundRect(x + gap / 2, y, barWidth - gap, barH, 2);
+      ctx.fill();
+    });
+  }
+
+  clear() {
+    this.bars = [];
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  // Waveform statique pour lecture
+  drawStatic(normalizedData) {
+    const { canvas, ctx } = this;
+    const { width, height } = canvas;
+    const mid = height / 2;
+    ctx.clearRect(0, 0, width, height);
+
+    const step = width / normalizedData.length;
+    normalizedData.forEach((v, i) => {
+      const barH = Math.max(v * mid * 1.8, 2);
+      ctx.fillStyle = `rgba(79, 127, 255, ${0.3 + v * 0.5})`;
+      ctx.fillRect(i * step, mid - barH / 2, Math.max(step - 1, 1), barH);
+    });
+  }
+}
+
+// ── AUDIO PLAYER ─────────────────────────────
+class AudioPlayer {
+  constructor() {
+    this.audio    = new Audio();
+    this.onUpdate = null;
+    this.onEnd    = null;
+
+    this.audio.ontimeupdate = () => this.onUpdate?.(this.audio.currentTime, this.audio.duration);
+    this.audio.onended      = () => this.onEnd?.();
+  }
+
+  load(url) {
+    this.audio.src = url;
+    return this;
+  }
+
+  play()   { return this.audio.play(); }
+  pause()  { this.audio.pause(); }
+  seek(t)  { this.audio.currentTime = t; }
+
+  get currentTime() { return this.audio.currentTime; }
+  get duration()    { return this.audio.duration || 0; }
+  get paused()      { return this.audio.paused; }
+  get progress()    { return this.duration > 0 ? this.currentTime / this.duration : 0; }
+
+  destroy() {
+    this.audio.pause();
+    this.audio.src = '';
+  }
+}
+
+// ── METRONOME ────────────────────────────────
+class Metronome {
+  constructor(bpm = 60) {
+    this.bpm      = bpm;
+    this.running  = false;
+    this.ctx      = null;
+    this.nextTime = 0;
+    this.onClick  = null;
+  }
+
+  _createClick(time) {
+    const osc    = this.ctx.createOscillator();
+    const gain   = this.ctx.createGain();
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.frequency.setValueAtTime(880, time);
+    gain.gain.setValueAtTime(0.3, time);
+    gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
+
+    osc.start(time);
+    osc.stop(time + 0.05);
+    this.onClick?.();
+  }
+
+  _schedule() {
+    while (this.nextTime < this.ctx.currentTime + 0.1) {
+      this._createClick(this.nextTime);
+      this.nextTime += 60 / this.bpm;
+    }
+    if (this.running) {
+      this._timer = setTimeout(() => this._schedule(), 25);
+    }
+  }
+
+  start(bpm) {
+    if (bpm) this.bpm = bpm;
+    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    this.running  = true;
+    this.nextTime = this.ctx.currentTime;
+    this._schedule();
+  }
+
+  stop() {
+    this.running = false;
+    clearTimeout(this._timer);
+  }
+
+  setBPM(bpm) {
+    this.bpm = bpm;
+  }
+}
+
+// ── FORMAT HELPERS ────────────────────────────
+function formatDuration(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function formatElapsed(seconds) {
+  if (seconds < 60) return `${Math.floor(seconds)}s`;
+  return `${Math.floor(seconds / 60)}min ${Math.floor(seconds % 60)}s`;
+}
+
+
+/* ===== src/app.js ===== */
+// ============================================
+// VOIXCLAIRE — APPLICATION PRINCIPALE
+// Router, pages, contrôleurs
+// ============================================
+
+
+
+
+
+// ── INIT ──────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // Seed demo data si première visite
+  if (!store.isLoggedIn() && store.get('sessions').length === 0) {
+    // Données démo pour l'expérience initiale
+    SAMPLE_SESSIONS.forEach(s => {
+      store.update('sessions', sessions => [{ ...s, id: s.id, date: s.date }, ...sessions]);
+    });
+    store.update('stats', stats => ({
+      ...stats,
+      totalMinutes: 52,
+      totalSessions: 3,
+      totalExercises: 11,
+      currentStreak: 3,
+      longestStreak: 3,
+      averageScore: 75,
+      weeklyData: [12, 0, 18, 0, 22, 0, 0],
+    }));
+    store.update('achievements', () => ['first-session', 'streak-3']);
+  }
+
+  setTimeout(() => {
+    document.getElementById('loading-screen')?.classList.add('hidden');
+    App.init();
+  }, 1800);
+});
+
+// ── ROUTER ───────────────────────────────────
+const App = {
+  currentPage: null,
+
+  init() {
+    if (!store.get('onboarded')) {
+      this.render('onboarding');
+    } else {
+      this.render('dashboard');
+      this.setupShell();
+    }
+  },
+
+  setupShell() {
+    document.getElementById('app').innerHTML = SHELL_TEMPLATE();
+    this.bindNav();
+    this.navigate('dashboard');
+  },
+
+  navigate(page, params = {}) {
+    this.currentPage = page;
+    const content = document.getElementById('page-content');
+    if (!content) return;
+
+    // Update nav active state
+    document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === page);
+    });
+
+    // Update page title
+    const titles = {
+      dashboard:  'Tableau de bord',
+      exercises:  'Exercices',
+      recording:  'Enregistrement',
+      stats:      'Progression',
+      profile:    'Profil',
+    };
+    document.getElementById('page-title')?.textContent && (document.getElementById('page-title').textContent = titles[page] || '');
+
+    content.innerHTML = '';
+    content.className = 'page-content page-enter';
+
+    const pages = {
+      dashboard:  PageDashboard,
+      exercises:  PageExercises,
+      recording:  PageRecording,
+      stats:      PageStats,
+      profile:    PageProfile,
+    };
+
+    const PageClass = pages[page];
+    if (PageClass) {
+      const instance = new PageClass(content, params);
+      instance.render();
+    }
+
+    // Close mobile sidebar
+    document.getElementById('sidebar')?.classList.remove('open');
+  },
+
+  render(screen, params) {
+    const app = document.getElementById('app');
+    if (screen === 'onboarding') {
+      app.innerHTML = OnboardingScreen();
+      bindOnboarding();
+    }
+  },
+
+  bindNav() {
+    document.querySelectorAll('[data-page]').forEach(el => {
+      el.addEventListener('click', () => this.navigate(el.dataset.page));
+    });
+
+    document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+      document.getElementById('sidebar')?.classList.toggle('open');
+    });
+
+    // Update user pill
+    const user = store.get('user') || { name: 'Utilisateur', email: '' };
+    const initials = user.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'VC';
+    const pill = document.querySelector('.user-avatar');
+    if (pill) pill.textContent = initials;
+    const nameEl = document.querySelector('.user-name');
+    if (nameEl) nameEl.textContent = user.name || 'Mon profil';
+  }
+};
+
+// ── TEMPLATES LAYOUT ─────────────────────────
+function SHELL_TEMPLATE() {
+  const user = store.get('user') || { name: 'Utilisateur' };
+  const initials = user.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'VC';
+  const streak = store.get('stats.currentStreak') || 0;
+
+  return `
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M2 12h4l3-8 5 16 3-8 3 4 2-4" stroke="#4F7FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="sidebar-logo-text">VoixClaire</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Principal</div>
+        <button class="nav-item" data-page="dashboard">
+          <span class="nav-icon">${Icons.dashboard}</span>Tableau de bord
+        </button>
+        <button class="nav-item" data-page="exercises">
+          <span class="nav-icon">${Icons.exercises}</span>Exercices
+        </button>
+        <button class="nav-item" data-page="recording">
+          <span class="nav-icon">${Icons.mic}</span>Enregistrement
+        </button>
+
+        <div class="nav-section-label">Suivi</div>
+        <button class="nav-item" data-page="stats">
+          <span class="nav-icon">${Icons.stats}</span>Progression
+        </button>
+
+        <div class="nav-section-label">Compte</div>
+        <button class="nav-item" data-page="profile">
+          <span class="nav-icon">${Icons.user}</span>Profil
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        ${streak > 0 ? `
+          <div class="streak-display mb-4">
+            <span class="streak-fire">🔥</span>
+            <span class="streak-count">${streak}</span>
+            <span class="streak-text">jours consécutifs</span>
+          </div>
+        ` : ''}
+        <div class="user-pill">
+          <div class="user-avatar">${initials}</div>
+          <div class="user-info">
+            <div class="user-name">${user.name || 'Mon profil'}</div>
+            <div class="user-status">Plan gratuit</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <!-- Desktop topbar -->
+      <header class="top-bar">
+        <div id="page-title" class="top-bar-title">Tableau de bord</div>
+        <div class="top-bar-actions">
+          <button class="btn btn-primary btn-sm" onclick="App.navigate('exercises')">
+            ${Icons.exercises} Commencer
+          </button>
+        </div>
+      </header>
+
+      <!-- Mobile topbar -->
+      <header class="mobile-topbar">
+        <div class="flex items-center gap-3">
+          <button class="btn btn-ghost btn-icon" id="mobile-menu-btn">${Icons.menu}</button>
+          <span class="sidebar-logo-text" style="font-size:16px">VoixClaire</span>
+        </div>
+        ${streak > 0 ? `<div class="flex items-center gap-2" style="color:var(--amber);font-size:13px;font-weight:700">🔥 ${streak}</div>` : ''}
+      </header>
+
+      <!-- Page content -->
+      <div id="page-content" class="page-content"></div>
+    </main>
+
+    <!-- Mobile nav -->
+    <nav class="mobile-nav">
+      <button class="mobile-nav-item" data-page="dashboard">${Icons.dashboard}<span>Accueil</span></button>
+      <button class="mobile-nav-item" data-page="exercises">${Icons.exercises}<span>Exercices</span></button>
+      <button class="mobile-nav-item" data-page="recording">${Icons.mic}<span>Voix</span></button>
+      <button class="mobile-nav-item" data-page="stats">${Icons.stats}<span>Stats</span></button>
+      <button class="mobile-nav-item" data-page="profile">${Icons.user}<span>Profil</span></button>
+    </nav>
+  </div>
+  `;
+}
+
+// ── PAGE: DASHBOARD ───────────────────────────
+class PageDashboard {
+  constructor(el) { this.el = el; }
+
+  render() {
+    const stats   = store.get('stats');
+    const today   = store.getTodaySessions();
+    const todayMin = store.getTodayMinutes();
+    const goal    = store.get('goals.dailyMinutes') || 15;
+    const progress = Math.min(Math.round((todayMin / goal) * 100), 100);
+    const recentSessions = store.getSessions(3);
+    const achievements = store.get('achievements') || [];
+
+    this.el.innerHTML = `
+      <!-- Hero du jour -->
+      <div class="card card-accent p-8 mb-6" style="background:linear-gradient(135deg,var(--bg-card) 0%,rgba(79,127,255,0.05) 100%)">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <div class="text-xs font-bold" style="color:var(--accent);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">
+              ${new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </div>
+            <div class="font-display" style="font-size:24px;font-weight:800;letter-spacing:-0.5px">
+              ${this._greeting()}, ${store.get('user.name') || 'Praticien'} 👋
+            </div>
+            <div style="color:var(--text-secondary);font-size:14px;margin-top:4px">
+              ${today.length === 0 ? 'Aucune session aujourd\'hui — commencez votre entraînement.' : `${today.length} session${today.length > 1 ? 's' : ''} réalisée${today.length > 1 ? 's' : ''} aujourd\'hui.`}
+            </div>
+          </div>
+          <div class="score-circle" style="display:flex;align-items:center;justify-content:center;position:relative;width:100px;height:100px">
+            ${progressRingSVG(progress, 100, 5)}
+            <div class="score-value" style="position:absolute;text-align:center">
+              <div style="font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-1px;color:${progress >= 100 ? 'var(--green)' : 'var(--text-primary)'}">${progress}%</div>
+              <div style="font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">objectif</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)">
+          <span>${todayMin} min aujourd'hui</span><span>Objectif: ${goal} min</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+      </div>
+
+      <!-- Stats clés -->
+      <div class="stats-grid mb-8">
+        <div class="stat-card card" style="--stat-accent:var(--accent)">
+          <div class="stat-label">Sessions totales</div>
+          <div class="stat-value">${stats.totalSessions}</div>
+          <div class="stat-sub flex items-center gap-2">
+            <span class="stat-trend up">${Icons.arrowUp} +1</span>
+            <span>cette semaine</span>
+          </div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--purple)">
+          <div class="stat-label">Minutes entraînées</div>
+          <div class="stat-value">${stats.totalMinutes}</div>
+          <div class="stat-sub">Total cumulé</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--green)">
+          <div class="stat-label">Score moyen</div>
+          <div class="stat-value" style="color:${scoreColor(stats.averageScore)}">${stats.averageScore || '—'}</div>
+          <div class="stat-sub">${stats.averageScore >= 75 ? '🎯 Très bien' : stats.averageScore >= 55 ? 'En progression' : 'Continuez'}</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--amber)">
+          <div class="stat-label">Série actuelle</div>
+          <div class="stat-value" style="color:var(--amber)">${stats.currentStreak} 🔥</div>
+          <div class="stat-sub">Record: ${stats.longestStreak} jours</div>
+        </div>
+      </div>
+
+      <!-- Activité hebdomadaire -->
+      <div class="card p-6 mb-6">
+        <div class="section-header mb-4">
+          <div>
+            <div class="section-title">Activité de la semaine</div>
+            <div class="section-subtitle">Minutes d'entraînement par jour</div>
+          </div>
+        </div>
+        <div class="weekly-chart">
+          ${this._renderWeeklyChart(stats.weeklyData)}
+        </div>
+      </div>
+
+      <!-- Exercices recommandés -->
+      <div class="section-header mb-5">
+        <div>
+          <div class="section-title">Recommandés pour vous</div>
+          <div class="section-subtitle">Exercices sélectionnés selon votre progression</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="App.navigate('exercises')">
+          Tous les exercices ${Icons.chevronRight}
+        </button>
+      </div>
+      <div class="exercise-grid mb-8">
+        ${this._renderRecommendedExercises()}
+      </div>
+
+      <!-- Sessions récentes -->
+      <div class="section-header mb-5">
+        <div class="section-title">Sessions récentes</div>
+      </div>
+      <div class="session-list mb-8">
+        ${recentSessions.length > 0 ? recentSessions.map(s => this._renderSessionItem(s)).join('') : `
+          <div class="empty-state">
+            <div class="empty-icon">🎙️</div>
+            <div class="empty-title">Aucune session encore</div>
+            <div class="empty-desc">Lancez votre premier exercice pour voir votre historique ici.</div>
+          </div>
+        `}
+      </div>
+
+      <!-- Achievements -->
+      ${achievements.length > 0 ? `
+        <div class="section-header mb-5">
+          <div class="section-title">Récompenses obtenues</div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px">
+          ${ACHIEVEMENTS.map(a => `
+            <div class="achievement-badge ${achievements.includes(a.id) ? 'unlocked' : 'locked'}" title="${a.desc}">
+              <div class="achievement-icon">${a.icon}</div>
+              <div class="achievement-name">${a.name}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    `;
+
+    // Bind exercise cards
+    this.el.querySelectorAll('[data-exercise-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        App.navigate('exercises', { exerciseId: el.dataset.exerciseId });
+      });
+    });
+  }
+
+  _greeting() {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bonjour';
+    if (h < 18) return 'Bon après-midi';
+    return 'Bonsoir';
+  }
+
+  _renderWeeklyChart(data = [0,0,0,0,0,0,0]) {
+    const max = Math.max(...data, 1);
+    const today = getTodayIndex();
+    return DAYS_SHORT.map((day, i) => {
+      const val = data[i] || 0;
+      const height = Math.max((val / max) * 100, val > 0 ? 10 : 4);
+      return `
+        <div class="chart-bar-wrap">
+          <div class="chart-bar ${val > 0 ? (i === today ? 'today' : 'filled') : ''}"
+               style="height:${height}%" title="${val} min"></div>
+          <div class="chart-day ${i === today ? 'today' : ''}">${day}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  _renderRecommendedExercises() {
+    const recommended = [EXERCISES[0], EXERCISES[3], EXERCISES[6]];
+    return recommended.map(ex => this._exerciseCard(ex)).join('');
+  }
+
+  _exerciseCard(ex) {
+    const color = categoryColor(ex.category);
+    return `
+      <div class="card card-hover exercise-card" data-exercise-id="${ex.id}" style="cursor:pointer">
+        <div class="exercise-type-icon" style="background:${color}18;color:${color}">
+          ${ex.emoji}
+        </div>
+        <div class="exercise-card-title">${ex.title}</div>
+        <div class="exercise-card-desc">${ex.description?.slice(0, 90)}…</div>
+        <div class="exercise-card-meta">
+          <span>${Icons.clock} ${Math.round(ex.duration/60)} min</span>
+          <span>${Icons.repeat} ${ex.reps} rép.</span>
+          ${renderDifficulty(ex.difficulty)}
+        </div>
+      </div>
+    `;
+  }
+
+  _renderSessionItem(s) {
+    return `
+      <div class="session-item">
+        <div class="session-icon">🎙️</div>
+        <div class="session-info">
+          <div class="session-name">${s.name}</div>
+          <div class="session-meta">${relativeDate(s.date)} · ${s.duration} min · ${s.exercisesCount} exercices</div>
+        </div>
+        <div class="session-score" style="color:${scoreColor(s.score)}">${s.score}</div>
+      </div>
+    `;
+  }
+}
+
+// ── PAGE: EXERCICES ───────────────────────────
+class PageExercises {
+  constructor(el, params) {
+    this.el       = el;
+    this.params   = params;
+    this.filter   = 'all';
+    this.activeEx = null;
+  }
+
+  render() {
+    if (this.params?.exerciseId) {
+      const ex = EXERCISES.find(e => e.id === this.params.exerciseId);
+      if (ex) { this.renderExercise(ex); return; }
+    }
+
+    this.el.innerHTML = `
+      <!-- Header -->
+      <div class="section-header mb-6">
+        <div>
+          <div class="section-title">Bibliothèque d'exercices</div>
+          <div class="section-subtitle">${EXERCISES.length} exercices · 8 catégories</div>
+        </div>
+      </div>
+
+      <!-- Filtres catégories -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px" id="filter-bar">
+        <button class="btn btn-secondary btn-sm filter-btn active" data-filter="all">Tous</button>
+        ${Object.values(EXERCISE_CATEGORIES).map(c => `
+          <button class="btn btn-secondary btn-sm filter-btn" data-filter="${c.id}" style="gap:6px">
+            ${c.emoji} ${c.label}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- Grille exercices -->
+      <div class="exercise-grid" id="exercises-grid">
+        ${EXERCISES.map(ex => this._exerciseCard(ex)).join('')}
+      </div>
+    `;
+
+    // Bind filters
+    this.el.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.el.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'btn-primary'));
+        btn.classList.add('active');
+        this._filterExercises(btn.dataset.filter);
+      });
+    });
+
+    // Bind exercise clicks
+    this.el.querySelectorAll('[data-exercise-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const ex = EXERCISES.find(e => e.id === el.dataset.exerciseId);
+        if (ex) this.renderExercise(ex);
+      });
+    });
+  }
+
+  _filterExercises(filter) {
+    const grid = document.getElementById('exercises-grid');
+    const exercises = filter === 'all' ? EXERCISES : EXERCISES.filter(e => e.category === filter);
+    grid.innerHTML = exercises.map(ex => this._exerciseCard(ex)).join('');
+    grid.querySelectorAll('[data-exercise-id]').forEach(el => {
+      el.addEventListener('click', () => {
+        const ex = EXERCISES.find(e => e.id === el.dataset.exerciseId);
+        if (ex) this.renderExercise(ex);
+      });
+    });
+  }
+
+  _exerciseCard(ex) {
+    const color = categoryColor(ex.category);
+    const cat = EXERCISE_CATEGORIES[ex.category];
+    return `
+      <div class="card card-hover exercise-card" data-exercise-id="${ex.id}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div class="exercise-type-icon" style="background:${color}18;color:${color};margin-bottom:0">
+            ${ex.emoji}
+          </div>
+          <span class="badge" style="background:${color}15;color:${color};border-color:${color}30">
+            ${cat?.label || ex.category}
+          </span>
+        </div>
+        <div class="exercise-card-title">${ex.title}</div>
+        <div class="exercise-card-desc">${ex.description?.slice(0, 80)}…</div>
+        <div class="exercise-card-meta">
+          <span>${Icons.clock} ${Math.round(ex.duration/60)} min</span>
+          <span>${Icons.repeat} ×${ex.reps}</span>
+          ${renderDifficulty(ex.difficulty)}
+        </div>
+      </div>
+    `;
+  }
+
+  renderExercise(ex) {
+    let timerInterval = null;
+    let elapsed = 0;
+    let running = false;
+    let completed = false;
+    let rep = 0;
+    const recorder = new AudioRecorder();
+    let sessionStart = Date.now();
+
+    const color = categoryColor(ex.category);
+
+    this.el.innerHTML = `
+      <div class="exercise-active">
+        <!-- Back -->
+        <button class="btn btn-ghost btn-sm" id="back-btn" style="align-self:flex-start;margin-bottom:8px">
+          ${Icons.chevronLeft} Tous les exercices
+        </button>
+
+        <!-- Header -->
+        <div class="exercise-header-active">
+          <div class="exercise-phase" style="color:${color}">${EXERCISE_CATEGORIES[ex.category]?.label || ''}</div>
+          <div class="exercise-title-active">${ex.title}</div>
+          <div class="exercise-objective">${ex.objective}</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-top:12px;flex-wrap:wrap">
+            <span class="badge badge-blue">${Icons.clock} ${Math.round(ex.duration/60)} min</span>
+            <span class="badge badge-purple">${Icons.repeat} ${ex.reps} répétitions</span>
+            <span class="badge">${renderDifficulty(ex.difficulty, 5)} Niveau ${ex.difficulty}/5</span>
+          </div>
+        </div>
+
+        <!-- Chrono -->
+        <div class="card p-8" style="text-align:center">
+          <div class="timer-display" id="timer-display">00:00</div>
+          <div class="timer-label">
+            Objectif: ${formatTime(ex.duration)} · 
+            <span id="rep-counter">${rep}/${ex.reps}</span> répétitions
+          </div>
+          <div class="progress-bar" style="margin:16px 0">
+            <div class="progress-fill" id="timer-progress" style="width:0%"></div>
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center;margin-top:20px" id="timer-controls">
+            <button class="btn btn-primary btn-lg" id="start-btn">
+              ${Icons.play} Commencer
+            </button>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instruction-card">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:16px">
+            Instructions
+          </div>
+          ${ex.instructions.map((inst, i) => `
+            <div class="instruction-step">
+              <div class="step-number">${i + 1}</div>
+              <div class="step-text">${inst.text}</div>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Texte à lire (si applicable) -->
+        ${ex.text ? `
+          <div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:12px">
+              Texte d'exercice
+            </div>
+            <div class="text-to-read">${ex.text}</div>
+          </div>
+        ` : ''}
+
+        <!-- Tips -->
+        ${ex.tips ? `
+          <div class="tips-card">
+            <div class="tips-icon">💡</div>
+            <div class="tips-content">
+              <div class="tips-title">Conseil de praticien</div>
+              <div class="tips-text">${ex.tips}</div>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Enregistrement intégré -->
+        <div class="card" style="overflow:hidden">
+          <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border-subtle)">
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary)">Enregistrement de cet exercice</div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-top:2px">
+              Enregistrez-vous pour analyser votre progression
+            </div>
+          </div>
+          <div style="padding:24px" id="mini-recorder">
+            <div style="display:flex;align-items:center;justify-content:center;gap:20px">
+              <div class="record-btn-outer" id="ex-record-btn">
+                <div class="record-btn-inner"></div>
+              </div>
+              <div>
+                <div class="recording-time" id="ex-rec-time">0:00</div>
+                <div style="font-size:12px;color:var(--text-muted)" id="ex-rec-status">Prêt à enregistrer</div>
+              </div>
+            </div>
+            <canvas id="ex-waveform" width="400" height="50" style="width:100%;height:50px;margin-top:16px;display:none"></canvas>
+          </div>
+        </div>
+
+        <!-- Résultat (masqué initialement) -->
+        <div class="card p-8" id="result-card" style="display:none;text-align:center">
+          <div style="font-size:32px;margin-bottom:12px">🎉</div>
+          <div class="font-display" style="font-size:22px;font-weight:800;margin-bottom:8px">Exercice terminé !</div>
+          <div style="color:var(--text-secondary);margin-bottom:24px">Belle session de travail.</div>
+          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-secondary" id="retry-btn">Recommencer</button>
+            <button class="btn btn-primary" onclick="App.navigate('exercises')">
+              Exercice suivant ${Icons.chevronRight}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ── TIMER LOGIC ─────────────────────────────
+    const timerEl    = document.getElementById('timer-display');
+    const progressEl = document.getElementById('timer-progress');
+    const repEl      = document.getElementById('rep-counter');
+    const startBtn   = document.getElementById('start-btn');
+    const resultCard = document.getElementById('result-card');
+
+    const tick = () => {
+      elapsed++;
+      timerEl.textContent = formatTime(elapsed);
+      progressEl.style.width = `${Math.min((elapsed / ex.duration) * 100, 100)}%`;
+
+      if (elapsed >= ex.duration && !completed) {
+        completed = true;
+        clearInterval(timerInterval);
+        running = false;
+        startBtn.innerHTML = `${Icons.check} Terminé`;
+        startBtn.classList.replace('btn-primary', 'btn-secondary');
+        startBtn.disabled = true;
+        resultCard.style.display = 'block';
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Save session
+        const duration = Math.round((Date.now() - sessionStart) / 60000);
+        store.addSession({
+          name: ex.title,
+          duration: Math.max(1, duration),
+          exercisesCount: 1,
+          score: Math.round(60 + Math.random() * 30), // Score demo — remplacé par audio analysis en V2
+          exercises: [ex.id],
+        });
+        showToast('Exercice complété ! Bien joué.', 'success');
+      }
+    };
+
+    startBtn.addEventListener('click', () => {
+      if (!running && !completed) {
+        running = true;
+        timerInterval = setInterval(tick, 1000);
+        startBtn.innerHTML = `${Icons.pause} En cours…`;
+        startBtn.disabled = true;
+      }
+    });
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      clearInterval(timerInterval);
+      recorder.destroy();
+      this.render();
+    });
+
+    document.getElementById('retry-btn')?.addEventListener('click', () => {
+      clearInterval(timerInterval);
+      recorder.destroy();
+      this.renderExercise(ex);
+    });
+
+    // ── MINI RECORDER ─────────────────────────
+    const recBtn    = document.getElementById('ex-record-btn');
+    const recTime   = document.getElementById('ex-rec-time');
+    const recStatus = document.getElementById('ex-rec-status');
+    const waveCanvas = document.getElementById('ex-waveform');
+    let waveRenderer = null;
+    let recTimer    = null;
+    let recElapsed  = 0;
+
+    recBtn.addEventListener('click', async () => {
+      if (recorder.isRecording()) {
+        const result = await recorder.stop();
+        clearInterval(recTimer);
+        recBtn.classList.remove('recording');
+        recStatus.textContent = `Enregistrement sauvegardé (${formatElapsed(recElapsed)})`;
+        if (result) {
+          store.addRecording({
+            exerciseId: ex.id,
+            exerciseName: ex.title,
+            duration: result.duration,
+            url: result.url,
+            analysis: result.analysis,
+          });
+          showToast('Enregistrement sauvegardé', 'success');
+        }
+      } else {
+        const ok = await recorder.start();
+        if (!ok) { showToast('Accès au microphone requis.', 'error'); return; }
+        recBtn.classList.add('recording');
+        recStatus.textContent = 'Enregistrement en cours…';
+        waveCanvas.style.display = 'block';
+        waveRenderer = new WaveformRenderer(waveCanvas);
+        recElapsed = 0;
+        recTimer = setInterval(() => {
+          recElapsed++;
+          recTime.textContent = formatTime(recElapsed);
+          recTime.classList.add('visible');
+        }, 1000);
+        recorder.onWaveformData = (data, amp) => {
+          waveRenderer?.push(amp);
+        };
+      }
+    });
+  }
+}
+
+// ── PAGE: ENREGISTREMENT ──────────────────────
+class PageRecording {
+  constructor(el) {
+    this.el       = el;
+    this.recorder = new AudioRecorder();
+    this.renderer = null;
+    this.player   = null;
+    this.tab      = 'record';
+  }
+
+  render() {
+    this.el.innerHTML = `
+      <!-- Tabs -->
+      <div class="tab-bar mb-8" style="max-width:400px">
+        <button class="tab-item active" id="tab-record" data-tab="record">Enregistrer</button>
+        <button class="tab-item" id="tab-library" data-tab="library">Bibliothèque</button>
+        <button class="tab-item" id="tab-compare" data-tab="compare">Comparaison</button>
+      </div>
+
+      <div id="tab-content"></div>
+    `;
+
+    this.el.querySelectorAll('.tab-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.el.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.tab = btn.dataset.tab;
+        this._renderTab();
+      });
+    });
+
+    this._renderTab();
+  }
+
+  _renderTab() {
+    const content = document.getElementById('tab-content');
+    if (this.tab === 'record')   this._renderRecord(content);
+    if (this.tab === 'library')  this._renderLibrary(content);
+    if (this.tab === 'compare')  this._renderCompare(content);
+  }
+
+  _renderRecord(el) {
+    let elapsed = 0;
+    let timerInterval = null;
+    let lastResult = null;
+
+    el.innerHTML = `
+      <div style="max-width:600px;margin:0 auto">
+        <!-- Exercice selector -->
+        <div class="card p-6 mb-6">
+          <div class="form-group mb-0">
+            <label class="form-label">Exercice associé</label>
+            <select class="form-input" id="exercise-select">
+              <option value="">— Enregistrement libre —</option>
+              ${EXERCISES.map(e => `<option value="${e.id}">${e.title}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+
+        <!-- Zone d'enregistrement -->
+        <div class="recording-zone" id="recording-zone">
+          <!-- Waveform -->
+          <div class="waveform-container">
+            <canvas id="waveform-canvas" width="600" height="80" style="width:100%;height:80px"></canvas>
+          </div>
+
+          <!-- Timer -->
+          <div>
+            <div class="timer-display" id="rec-timer">0:00</div>
+            <div class="timer-label" id="rec-label">Prêt à enregistrer</div>
+          </div>
+
+          <!-- Bouton record -->
+          <div class="record-btn-outer" id="main-rec-btn">
+            <div class="record-btn-inner"></div>
+          </div>
+        </div>
+
+        <!-- Contrôles -->
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:16px" id="rec-controls">
+          <button class="btn btn-secondary" id="save-btn" disabled>
+            Sauvegarder
+          </button>
+          <button class="btn btn-ghost" id="discard-btn" disabled>
+            Recommencer
+          </button>
+        </div>
+
+        <!-- Résultat analyse -->
+        <div id="analysis-result" style="display:none" class="card p-6 mt-6">
+          <div class="section-title mb-4">Analyse de l'enregistrement</div>
+          <div id="analysis-content"></div>
+        </div>
+      </div>
+    `;
+
+    const recBtn    = document.getElementById('main-rec-btn');
+    const recZone   = document.getElementById('recording-zone');
+    const timerEl   = document.getElementById('rec-timer');
+    const labelEl   = document.getElementById('rec-label');
+    const saveBtn   = document.getElementById('save-btn');
+    const discardBtn = document.getElementById('discard-btn');
+    const canvas    = document.getElementById('waveform-canvas');
+    this.renderer   = new WaveformRenderer(canvas);
+
+    this.recorder.onWaveformData = (data, amp) => this.renderer.push(amp);
+
+    recBtn.addEventListener('click', async () => {
+      if (this.recorder.isRecording()) {
+        // Stop
+        lastResult = await this.recorder.stop();
+        clearInterval(timerInterval);
+        recBtn.classList.remove('recording');
+        recZone.classList.remove('active');
+        labelEl.textContent = `Terminé — ${formatElapsed(elapsed)}`;
+        saveBtn.disabled = false;
+        discardBtn.disabled = false;
+        if (lastResult) this._showAnalysis(lastResult.analysis);
+      } else {
+        // Start
+        const ok = await this.recorder.start();
+        if (!ok) { showToast('Accès au microphone refusé.', 'error'); return; }
+        elapsed = 0;
+        timerInterval = setInterval(() => {
+          elapsed++;
+          timerEl.textContent = formatTime(elapsed);
+        }, 1000);
+        recBtn.classList.add('recording');
+        recZone.classList.add('active');
+        labelEl.textContent = 'Enregistrement en cours…';
+        this.renderer.clear();
+        document.getElementById('analysis-result').style.display = 'none';
+      }
+    });
+
+    saveBtn.addEventListener('click', () => {
+      if (!lastResult) return;
+      const exerciseId = document.getElementById('exercise-select').value;
+      const ex = EXERCISES.find(e => e.id === exerciseId);
+      store.addRecording({
+        exerciseId: exerciseId || 'free',
+        exerciseName: ex?.title || 'Enregistrement libre',
+        duration: lastResult.duration,
+        url: lastResult.url,
+        analysis: lastResult.analysis,
+      });
+      showToast('Enregistrement sauvegardé dans votre bibliothèque.', 'success');
+      saveBtn.disabled = true;
+      discardBtn.disabled = true;
+      this.tab = 'library';
+      this.el.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      this.el.querySelector('[data-tab="library"]').classList.add('active');
+      this._renderTab();
+    });
+
+    discardBtn.addEventListener('click', () => {
+      lastResult = null;
+      elapsed = 0;
+      timerEl.textContent = '0:00';
+      labelEl.textContent = 'Prêt à enregistrer';
+      saveBtn.disabled = true;
+      discardBtn.disabled = true;
+      this.renderer.clear();
+      document.getElementById('analysis-result').style.display = 'none';
+    });
+  }
+
+  _showAnalysis(analysis) {
+    if (!analysis) return;
+    const card = document.getElementById('analysis-result');
+    card.style.display = 'block';
+    document.getElementById('analysis-content').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card card" style="--stat-accent:var(--accent)">
+          <div class="stat-label">Durée</div>
+          <div class="stat-value" style="font-size:20px">${formatElapsed(analysis.duration)}</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--green)">
+          <div class="stat-label">Ratio parole</div>
+          <div class="stat-value" style="font-size:20px">${Math.round((analysis.speechRatio || 0) * 100)}%</div>
+          <div class="stat-sub">Temps effectif de parole</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--purple)">
+          <div class="stat-label">Pauses détectées</div>
+          <div class="stat-value" style="font-size:20px">${analysis.pauseCount || 0}</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--amber)">
+          <div class="stat-label">Débit estimé</div>
+          <div class="stat-value" style="font-size:20px">${analysis.syllablesPerMinute || '—'}</div>
+          <div class="stat-sub">syllabes/min</div>
+        </div>
+      </div>
+      <div class="tips-card mt-4">
+        <div class="tips-icon">ℹ️</div>
+        <div class="tips-content">
+          <div class="tips-title">Note sur l'analyse</div>
+          <div class="tips-text">L'analyse locale est une estimation basée sur l'amplitude et les pauses. Une analyse de précision (débit exact, clarté phonétique, scoring IA) sera disponible dans la version cloud avec intégration Whisper / modèle de scoring vocal.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  _renderLibrary(el) {
+    const recordings = store.getRecordings();
+
+    el.innerHTML = `
+      <div>
+        <div class="section-header mb-5">
+          <div>
+            <div class="section-title">Vos enregistrements</div>
+            <div class="section-subtitle">${recordings.length} enregistrement${recordings.length !== 1 ? 's' : ''} sauvegardé${recordings.length !== 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        ${recordings.length === 0 ? `
+          <div class="empty-state card">
+            <div class="empty-icon">🎙️</div>
+            <div class="empty-title">Aucun enregistrement</div>
+            <div class="empty-desc">Réalisez votre premier enregistrement pour constituer votre bibliothèque vocale.</div>
+            <button class="btn btn-primary mt-4" onclick="document.querySelector('[data-tab=record]').click()">
+              Enregistrer maintenant
+            </button>
+          </div>
+        ` : `
+          <div class="session-list" id="recordings-list">
+            ${recordings.map((r, i) => `
+              <div class="recording-item" id="rec-item-${i}">
+                <button class="recording-play-btn" data-url="${r.url}" data-idx="${i}" id="play-btn-${i}">
+                  ${Icons.play}
+                </button>
+                <div class="recording-info">
+                  <div class="recording-name">${r.exerciseName || 'Enregistrement'}</div>
+                  <div class="recording-meta">${relativeDate(r.createdAt)} · ${formatElapsed(r.duration)}</div>
+                </div>
+                <canvas class="recording-mini-wave" width="80" height="24"></canvas>
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>
+    `;
+
+    // Draw mini waveforms
+    el.querySelectorAll('.recording-mini-wave').forEach(canvas => {
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width; const h = canvas.height;
+      // Waveform décorative générée aléatoirement (remplace audio réel)
+      for (let i = 0; i < w; i += 3) {
+        const amp = (Math.random() * 0.7 + 0.1) * h;
+        ctx.fillStyle = 'rgba(79,127,255,0.5)';
+        ctx.fillRect(i, (h - amp) / 2, 2, amp);
+      }
+    });
+
+    // Play buttons
+    el.querySelectorAll('.recording-play-btn').forEach(btn => {
+      const url = btn.dataset.url;
+      if (!url) return;
+      btn.addEventListener('click', () => {
+        if (!this.player) this.player = new AudioPlayer();
+        if (!this.player.paused && this.currentPlayUrl === url) {
+          this.player.pause();
+          btn.innerHTML = Icons.play;
+        } else {
+          this.currentPlayUrl = url;
+          this.player.load(url).play();
+          btn.innerHTML = Icons.pause;
+          this.player.onEnd = () => { btn.innerHTML = Icons.play; };
+        }
+      });
+    });
+  }
+
+  _renderCompare(el) {
+    const recordings = store.getRecordings();
+    el.innerHTML = `
+      <div class="card p-8 text-center">
+        <div style="font-size:32px;margin-bottom:12px">📊</div>
+        <div class="font-display" style="font-size:20px;font-weight:700;margin-bottom:8px">Comparaison de sessions</div>
+        <div style="color:var(--text-secondary);font-size:14px;line-height:1.6;max-width:400px;margin:0 auto 24px">
+          Sélectionnez deux enregistrements du même exercice pour comparer votre progression dans le temps.
+        </div>
+        ${recordings.length < 2 ? `
+          <div style="color:var(--text-muted);font-size:13px">
+            Vous avez besoin d'au moins 2 enregistrements pour utiliser la comparaison.
+          </div>
+        ` : `
+          <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <div class="form-label mb-2">Enregistrement A</div>
+              <select class="form-input" id="compare-a">
+                ${recordings.map((r, i) => `<option value="${i}">${r.exerciseName} — ${relativeDate(r.createdAt)}</option>`).join('')}
+              </select>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <div class="form-label mb-2">Enregistrement B</div>
+              <select class="form-input" id="compare-b">
+                ${recordings.map((r, i) => `<option value="${i}" ${i===1?'selected':''}>${r.exerciseName} — ${relativeDate(r.createdAt)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary mt-4">Comparer</button>
+        `}
+      </div>
+      <div class="tips-card mt-6">
+        <div class="tips-icon">🚀</div>
+        <div class="tips-content">
+          <div class="tips-title">Version V2 — Analyse comparative avancée</div>
+          <div class="tips-text">La comparaison IA (score de clarté phonétique, débit précis, stabilité vocale, visualisation spectrographique) sera disponible avec l'intégration du service cloud de scoring vocal.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  destroy() {
+    this.recorder.destroy();
+    this.player?.destroy();
+  }
+}
+
+// ── PAGE: STATISTIQUES ────────────────────────
+class PageStats {
+  constructor(el) { this.el = el; }
+
+  render() {
+    const stats    = store.get('stats');
+    const sessions = store.getSessions(20);
+    const achievements = store.get('achievements') || [];
+
+    this.el.innerHTML = `
+      <!-- Vue globale -->
+      <div class="section-title mb-2">Votre progression</div>
+      <div class="section-subtitle mb-6">Suivi détaillé de votre entraînement vocal</div>
+
+      <!-- Métriques clés -->
+      <div class="stats-grid mb-8">
+        <div class="stat-card card" style="--stat-accent:var(--accent)">
+          <div class="stat-label">Sessions totales</div>
+          <div class="stat-value">${stats.totalSessions}</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--purple)">
+          <div class="stat-label">Temps total</div>
+          <div class="stat-value">${stats.totalMinutes}<span style="font-size:16px;font-weight:600"> min</span></div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--green)">
+          <div class="stat-label">Exercices réalisés</div>
+          <div class="stat-value">${stats.totalExercises}</div>
+        </div>
+        <div class="stat-card card" style="--stat-accent:var(--amber)">
+          <div class="stat-label">Score moyen</div>
+          <div class="stat-value" style="color:${scoreColor(stats.averageScore)}">${stats.averageScore || '—'}</div>
+        </div>
+      </div>
+
+      <!-- Streak -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="section-title mb-1">Régularité</div>
+            <div class="text-sm text-secondary">Continuité de l'entraînement</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:36px;font-weight:800;color:var(--amber);font-family:var(--font-display)">
+              ${stats.currentStreak} 🔥
+            </div>
+            <div style="font-size:12px;color:var(--text-muted)">jours consécutifs</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:20px">
+          ${DAYS_SHORT.map((d, i) => {
+            const hasSession = sessions.some(s => {
+              const day = new Date(s.date);
+              return (day.getDay() + 6) % 7 === i;
+            });
+            return `
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;
+                  background:${hasSession ? 'var(--accent)' : 'var(--bg-elevated)'};
+                  color:${hasSession ? 'white' : 'var(--text-muted)'}">
+                  ${hasSession ? '✓' : ''}
+                </div>
+                <div style="font-size:10px;color:var(--text-muted);font-weight:600">${d}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Activité hebdo -->
+      <div class="card p-6 mb-6">
+        <div class="section-title mb-4">Activité hebdomadaire</div>
+        <div class="weekly-chart">
+          ${DAYS_SHORT.map((day, i) => {
+            const val = stats.weeklyData?.[i] || 0;
+            const max = Math.max(...(stats.weeklyData || [1]), 1);
+            const h   = Math.max((val / max) * 100, val > 0 ? 10 : 4);
+            const today = getTodayIndex();
+            return `
+              <div class="chart-bar-wrap">
+                <div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px;font-family:var(--font-mono)">${val || ''}</div>
+                <div class="chart-bar ${val > 0 ? (i === today ? 'today' : 'filled') : ''}" style="height:${h}%"></div>
+                <div class="chart-day ${i === today ? 'today' : ''}">${day}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- Historique des sessions -->
+      <div class="section-header mb-5">
+        <div class="section-title">Historique des sessions</div>
+      </div>
+      <div class="session-list mb-8">
+        ${sessions.length > 0 ? sessions.map(s => `
+          <div class="session-item">
+            <div class="session-icon">🎙️</div>
+            <div class="session-info">
+              <div class="session-name">${s.name}</div>
+              <div class="session-meta">${relativeDate(s.date)} · ${s.duration} min · ${s.exercisesCount} ex.</div>
+            </div>
+            <div style="text-align:right">
+              <div class="session-score" style="color:${scoreColor(s.score)}">${s.score}</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:2px">/100</div>
+            </div>
+          </div>
+        `).join('') : `
+          <div class="empty-state card">
+            <div class="empty-icon">📊</div>
+            <div class="empty-title">Aucune donnée encore</div>
+            <div class="empty-desc">Commencez à pratiquer pour voir votre progression ici.</div>
+          </div>
+        `}
+      </div>
+
+      <!-- Badges -->
+      <div class="section-title mb-4">Récompenses</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;margin-bottom:32px">
+        ${ACHIEVEMENTS.map(a => `
+          <div class="achievement-badge ${achievements.includes(a.id) ? 'unlocked' : 'locked'}" title="${a.desc}">
+            <div class="achievement-icon">${a.icon}</div>
+            <div class="achievement-name">${a.name}</div>
+            <div style="font-size:10px;color:var(--text-muted);text-align:center">${a.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+// ── PAGE: PROFIL ──────────────────────────────
+class PageProfile {
+  constructor(el) { this.el = el; }
+
+  render() {
+    const user = store.get('user') || { name: 'Utilisateur', email: 'demo@voixclaire.fr' };
+    const prefs = store.get('preferences') || {};
+    const goals = store.get('goals') || {};
+    const initials = user.name?.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'VC';
+
+    this.el.innerHTML = `
+      <!-- Profil -->
+      <div class="card p-8 mb-6" style="text-align:center">
+        <div class="user-avatar" style="width:72px;height:72px;font-size:26px;margin:0 auto 16px;border-radius:50%">${initials}</div>
+        <div class="font-display" style="font-size:22px;font-weight:700">${user.name}</div>
+        <div style="color:var(--text-secondary);font-size:14px;margin-top:4px">${user.email}</div>
+        <div style="margin-top:16px">
+          <span class="badge badge-purple">Plan gratuit</span>
+        </div>
+      </div>
+
+      <!-- Objectifs personnels -->
+      <div class="card p-6 mb-6">
+        <div class="section-title mb-4">Objectifs personnels</div>
+        <div class="form-group">
+          <label class="form-label">Minutes d'entraînement par jour</label>
+          <select class="form-input" id="goal-minutes">
+            ${[5,10,15,20,30,45,60].map(v => `
+              <option value="${v}" ${goals.dailyMinutes === v ? 'selected' : ''}>${v} minutes</option>
+            `).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jours d'entraînement par semaine</label>
+          <select class="form-input" id="goal-days">
+            ${[3,4,5,6,7].map(v => `
+              <option value="${v}" ${goals.weeklyDays === v ? 'selected' : ''}>${v} jours</option>
+            `).join('')}
+          </select>
+        </div>
+        <button class="btn btn-primary" id="save-goals">Enregistrer les objectifs</button>
+      </div>
+
+      <!-- Préférences -->
+      <div class="card p-6 mb-6">
+        <div class="section-title mb-4">Préférences</div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="flex items-center justify-between">
+            <div>
+              <div style="font-size:14px;font-weight:600">Afficher les conseils</div>
+              <div style="font-size:12px;color:var(--text-muted)">Conseils de praticien dans les exercices</div>
+            </div>
+            <button class="btn ${prefs.showTips !== false ? 'btn-primary' : 'btn-secondary'} btn-sm" id="toggle-tips">
+              ${prefs.showTips !== false ? 'Activé' : 'Désactivé'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Données & Confidentialité -->
+      <div class="card p-6 mb-6">
+        <div class="section-title mb-4">Données & confidentialité</div>
+        <div style="color:var(--text-secondary);font-size:13px;line-height:1.7;margin-bottom:16px">
+          Vos enregistrements audio sont stockés localement dans votre navigateur. 
+          Aucune donnée vocale n'est transmise à des serveurs sans votre consentement explicite.
+          La version cloud (V2) proposera un stockage sécurisé via Firebase avec chiffrement.
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="if(confirm('Réinitialiser toutes vos données ?')) store.reset()">
+          Réinitialiser les données
+        </button>
+      </div>
+
+      <!-- Architecture future -->
+      <div class="tips-card">
+        <div class="tips-icon">🔧</div>
+        <div class="tips-content">
+          <div class="tips-title">Stack technique</div>
+          <div class="tips-text">
+            Frontend vanilla JS + CSS tokens · Web Audio API · MediaRecorder API<br>
+            V2 : Firebase Auth + Firestore + Firebase Storage · Next.js migration<br>
+            V3 : Whisper API scoring · IA vocale · Modèle de progression personnalisé
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('save-goals')?.addEventListener('click', () => {
+      store.set('goals.dailyMinutes', parseInt(document.getElementById('goal-minutes').value));
+      store.set('goals.weeklyDays', parseInt(document.getElementById('goal-days').value));
+      showToast('Objectifs mis à jour.', 'success');
+    });
+
+    document.getElementById('toggle-tips')?.addEventListener('click', (e) => {
+      const current = store.get('preferences.showTips') !== false;
+      store.set('preferences.showTips', !current);
+      e.target.textContent = !current ? 'Activé' : 'Désactivé';
+      e.target.className = `btn ${!current ? 'btn-primary' : 'btn-secondary'} btn-sm`;
+    });
+  }
+}
+
+// ── ONBOARDING ────────────────────────────────
+function OnboardingScreen() {
+  return `
+    <div class="onboarding-screen">
+      <div class="onboarding-card">
+        <div class="onboarding-logo">
+          <div class="sidebar-logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M2 12h4l3-8 5 16 3-8 3 4 2-4" stroke="#4F7FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="sidebar-logo-text" style="font-size:20px">VoixClaire</span>
+        </div>
+
+        <div class="onboarding-title">Votre voix, perfectionnée.</div>
+        <div class="onboarding-subtitle">
+          Entraînez-vous chaque jour à mieux articuler, à parler plus distinctement et à projeter votre voix avec confiance.
+        </div>
+
+        <div id="onboarding-step-1">
+          <div class="form-group">
+            <label class="form-label">Votre prénom</label>
+            <input type="text" class="form-input" id="ob-name" placeholder="Marie, Thomas…" autocomplete="given-name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email (optionnel)</label>
+            <input type="email" class="form-input" id="ob-email" placeholder="votre@email.fr" autocomplete="email" />
+          </div>
+          <button class="btn btn-primary btn-lg w-full" id="ob-start-btn" style="margin-top:8px">
+            Commencer l'entraînement ${Icons.chevronRight}
+          </button>
+          <div class="divider">ou</div>
+          <button class="btn btn-secondary w-full" id="ob-demo-btn">
+            Essayer en mode démo
+          </button>
+        </div>
+
+        <div style="text-align:center;margin-top:24px">
+          <div style="display:flex;justify-content:center;gap:24px;font-size:12px;color:var(--text-muted)">
+            <span>🔒 100% privé</span>
+            <span>📱 Mobile & Desktop</span>
+            <span>🎙️ Analyse vocale</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function bindOnboarding() {
+  document.getElementById('ob-start-btn')?.addEventListener('click', () => {
+    const name  = document.getElementById('ob-name').value.trim() || 'Praticien';
+    const email = document.getElementById('ob-email').value.trim();
+    store.login({ name, email: email || 'demo@voixclaire.fr' });
+    App.setupShell();
+  });
+
+  document.getElementById('ob-demo-btn')?.addEventListener('click', () => {
+    store.login({ name: 'Utilisateur demo', email: 'demo@voixclaire.fr' });
+    App.setupShell();
+  });
+
+  document.getElementById('ob-name')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('ob-start-btn')?.click();
+  });
+}
+
+// Expose App globally for HTML onclick attributes
+window.App   = App;
+window.store = store;
+
+
+  </script>
+</body>
+</html>
